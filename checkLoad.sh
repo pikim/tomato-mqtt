@@ -1,15 +1,16 @@
 #!/bin/sh
-date="$( date +%s )"
-server="192.168.1.54"
-port="2003"
+
+source /jffs/dd-wrt-grafana/variables.sh
+
 load=`cat /proc/loadavg`
 load1=`echo "$load" | awk '{print $1}'`
 load5=`echo "$load" | awk '{print $2}'`
 load15=`echo "$load" | awk '{print $3}'`
 proc_run=`echo "$load" | awk '{print $4}' | awk -F '/' '{print $1}'`
 proc_total=`echo "$load" | awk '{print $4}' | awk -F '/' '{print $2}'`
-echo "ddwrt.perf.load.load_one.number $load1 $date" | nc $server $port ;
-echo "ddwrt.perf.load.load_five.number $load5 $date" | nc $server $port ;
-echo "ddwrt.perf.load.load_fifteen.number $load15 $date" | nc $server $port ;
-echo "ddwrt.perf.load.proc_run.number $proc_run $date" | nc $server $port ;
-echo "ddwrt.perf.load.proc_total.number $proc_total $date" | nc $server $port ;
+
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'load.load_one.number value='$load1
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'load.load_five.number value='$load5
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'load.load_fifteen.number value='$load15
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'load.proc_run.number value='$proc_run
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'load.proc_total.number value='$proc_total

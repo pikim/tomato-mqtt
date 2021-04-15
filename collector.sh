@@ -1,10 +1,9 @@
 #!/bin/sh
-/jffs/checkConnections.sh &
-/jffs/pingGateway.sh &
-/jffs/pingGoogle.sh &
-/jffs/pingLab.sh &
-/jffs/checkLoad.sh &
-/jffs/checkCPUTemp.sh &
-/jffs/checkMem.sh &
-/jffs/checkCPU.sh &
-/jffs/checkWirelessClients.sh &
+/jffs/dd-wrt-grafana/checkBandwidthInterface.sh &
+/jffs/dd-wrt-grafana/checkConnections.sh &
+/jffs/dd-wrt-grafana/pingGoogle.sh &
+/jffs/dd-wrt-grafana/checkLoad.sh &
+/jffs/dd-wrt-grafana/checkCPUTemp.sh &
+/jffs/dd-wrt-grafana/checkMem.sh &
+/jffs/dd-wrt-grafana/checkCPU.sh &
+/jffs/dd-wrt-grafana/checkClients.sh &
