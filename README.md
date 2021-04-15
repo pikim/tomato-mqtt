@@ -22,7 +22,7 @@ Connect Grafana to InfluxDB as a data source using the same username and passwor
 
 On to the router. Enable JFFS support on Tomato under Administration -> JFFS.
 
-Upload all shell scripts to /jffs/tomato-grafana/. Modify the IP, port, password, and username of your influxdb server in variables.sh. Also add any additional mount points you may want to monitor in this file as well, space-delimited.
+Upload all shell scripts to /jffs/tomato-grafana/. Modify the IP, port, password, and username of your influxdb server in variables.sh. Also add any additional mount points you may want to monitor in this file as well, space-delimited. Scripts do not have to be executable.
 
 Add the following three commands under Administration -> Scheduler as custom cron jobs:
 ```
