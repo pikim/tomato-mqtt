@@ -22,6 +22,6 @@ sh /jffs/dd-wrt-grafana/collector40.sh >/dev/null 2>&1
 ```
 These should all run every 1 minute on every day of the week.
 
-Import Grafana json dashbaord.
+Import Grafana json dashboard.
 
 Enjoy.
