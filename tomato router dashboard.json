@@ -498,7 +498,7 @@
       "grid": {},
       "gridPos": {
         "h": 8,
-        "w": 5,
+        "w": 7,
         "x": 0,
         "y": 3
       },
@@ -510,6 +510,7 @@
         "current": true,
         "max": true,
         "min": true,
+        "rightSide": false,
         "show": true,
         "total": false,
         "values": true
@@ -590,6 +591,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:1583",
           "format": "ms",
           "logBase": 1,
           "max": null,
@@ -597,6 +599,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:1584",
           "format": "short",
           "logBase": 1,
           "max": null,
@@ -626,8 +629,8 @@
       "grid": {},
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 5,
+        "w": 3,
+        "x": 7,
         "y": 3
       },
       "hiddenSeries": false,
@@ -765,7 +768,7 @@
         "current": false,
         "max": false,
         "min": false,
-        "show": true,
+        "show": false,
         "total": false,
         "values": false
       },
@@ -846,6 +849,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:1472",
           "format": "short",
           "logBase": 1,
           "max": null,
@@ -853,6 +857,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:1473",
           "format": "short",
           "logBase": 1,
           "max": null,
@@ -1027,7 +1032,7 @@
         "current": false,
         "max": false,
         "min": false,
-        "show": true,
+        "show": false,
         "total": false,
         "values": false
       },
@@ -2459,7 +2464,7 @@
         "current": false,
         "max": false,
         "min": false,
-        "show": true,
+        "show": false,
         "total": false,
         "values": false
       },
@@ -3420,7 +3425,7 @@
       }
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "schemaVersion": 27,
   "style": "dark",
   "tags": [],
@@ -3460,5 +3465,5 @@
   "timezone": "browser",
   "title": "FreshTomato Router Dashboard",
   "uid": "s8WX75XMz",
-  "version": 10
+  "version": 11
 }
