@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source /jffs/dd-wrt-grafana/variables.sh
+source /jffs/tomato-grafana/variables.sh
 
 connections=`cat /proc/net/nf_conntrack`
 tcp=`echo "$connections" | grep ipv4 | grep tcp | wc -l`
