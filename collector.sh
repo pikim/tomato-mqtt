@@ -1,4 +1,5 @@
 #!/bin/sh
+/jffs/tomato-grafana/checkDisk.sh &
 /jffs/tomato-grafana/checkBandwidthInterface.sh &
 /jffs/tomato-grafana/checkConnections.sh &
 /jffs/tomato-grafana/pingGoogle.sh &
