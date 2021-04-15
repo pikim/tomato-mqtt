@@ -1,9 +1,10 @@
 #!/bin/sh
-date="$( date +%s )"
-server="192.168.1.54"
-port="2003"
-google=`ping -c 10 www.google.com | tail -2`
-packet=`echo "$google" |grep "packet loss" | cut -d "," -f 3 | cut -d " " -f 2| sed 's/.$//'`
-google=`echo "$google" |grep "round-trip" | cut -d "=" -f 2 | cut -d "/" -f 1`
-echo "ddwrt.perf.ping.google.packetloss.percent $packet $date" | nc $server $port ;
-echo "ddwrt.perf.ping.google.latency $google $date" | nc $server $port ;
+
+source /jffs/tomato-grafana/variables.sh
+
+googleping=`ping -c 10 www.google.com | tail -2`
+packet=`echo "$googleping" | tr ',' '\n' | grep "packet loss" | grep -o '[0-9]\+'`
+google=`echo "$googleping" |grep "round-trip" | cut -d " " -f 4 | cut -d "/" -f 1`
+
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'ping.google.packetloss.percent value='$packet
+curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'ping.google.latency value='$google
