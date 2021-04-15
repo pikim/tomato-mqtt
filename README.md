@@ -2,6 +2,8 @@
 
 Scripts to display metrics from routers running FreshTomato. Developed on Netgear R7000.
 
+![Dashboard Preview](https://i.imgur.com/fR4c8LC.png)
+
 Based on dd-wrt-grafana by Trevor Dodds (https://grafana.com/grafana/dashboards/950), updated for influxdb and freshtomato.
 
 # Requirements
