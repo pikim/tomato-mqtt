@@ -1,6 +1,8 @@
 #!/bin/sh
 
-source /jffs/tomato-grafana/variables.sh
+source variables.sh
+
+cpuTemp=`cat /proc/dmu/temperature  | grep -o '[0-9]\+'`
 
 cpu=`cat /proc/stat | head -n1 | sed 's/cpu //'`
 user=`echo $cpu | awk '{print $1}'`
@@ -14,13 +16,14 @@ steal=`echo $cpu | awk '{print $8}'`
 guest=`echo $cpu | awk '{print $9}'`
 guest_nice=`echo $cpu | awk '{print $10}'`
 
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.user value='$user
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.nice value='$nice
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.system value='$system
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.idle value='$idle
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.iowait value='$iowait
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.irq value='$irq
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.softirq value='$softirq
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.steal value='$steal
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.guest value='$guest
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'cpu.guest_nice value='$guest_nice
+mqtt_publish "CPU temperature" $cpuTemp '"icon": "mdi:thermometer", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
+mqtt_publish "CPU IRQ" $irq '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU user" $user '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU nice" $nice '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU idle" $idle '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU guest" $guest '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU steal" $steal '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU iowait" $iowait '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU system" $system '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU softirq" $softirq '"icon": "mdi:timer-outline", "state_class": "measurement", '
+mqtt_publish "CPU guest nice" $guest_nice '"icon": "mdi:timer-outline", "state_class": "measurement", '

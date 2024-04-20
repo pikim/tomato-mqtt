@@ -1,43 +1,75 @@
-# tomato-grafana
+# tomato-mqtt
 
-Scripts to display metrics from routers running FreshTomato. Developed on Netgear R7000.
+Scripts to capture metrics from routers running FreshTomato. Developped for HomeAssistant with MQTT plugin (supports discovery). With slight modifications it should also run without HomeAssistant.
 
-![Dashboard Preview](https://i.imgur.com/fR4c8LC.png)
+Developed on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https://github.com/ch604/tomato-grafana).
 
-Based on dd-wrt-grafana by Trevor Dodds (https://grafana.com/grafana/dashboards/950), updated for influxdb and freshtomato.
+## Requirements
 
-# Requirements
+- Router running FreshTomato (tested on 2023.2)
+- Server running MQTT (and HomeAssistant)
 
-- Router running FreshTomato (tested on 2021.2)
-- Server running Grafana
-- Server running InfluxDB
+## Installation
 
-# Installation
+### mosquitto-client
 
-Enable auth on InfluxDB (on my apt-based debian install, this was at /etc/influxdb/influxdb.conf) and configure a user and password. The router scripts will expect auth for depositing data.
-
-Set up a blank InfluxDB database for storage (after installing influxdb-client, auth into influx from the command line, and run "CREATE DATABASE tomato", or whatever you would like to call it).
-
-Connect Grafana to InfluxDB as a data source using the same username and password you set up for influx auth.
-
-On to the router. Enable JFFS support on Tomato under Administration -> JFFS.
-
-Upload all shell scripts to /jffs/tomato-grafana/. Modify the IP, port, password, and username of your influxdb server in variables.sh. Also add any additional mount points you may want to monitor in this file as well, space-delimited. Scripts do not have to be executable.
-
-For speedtest results, download the Ookla ARM CLI tool from https://install.speedtest.net/app/cli/ookla-speedtest-1.0.0-arm-linux.tgz and place its contents into a folder called /jffs/speedtest/. The core speedtest binary should be executable.
-
-Add the following three commands under Administration -> Scheduler as custom cron jobs:
+Connect and mount a USB drive to the FreshTomato router
 ```
-sh /jffs/tomato-grafana/collector.sh >/dev/null 2>&1
-sh /jffs/tomato-grafana/collector20.sh >/dev/null 2>&1
-sh /jffs/tomato-grafana/collector40.sh >/dev/null 2>&1
+mkdir /mnt/sda1/opt
+mount -o bind /mnt/sda1/opt /opt
+```
+
+Install entware
+```
+/usr/sbin/entware-install.sh
+```
+
+Update, upgrade and install the desired package(s)
+```
+opkg update
+opkg upgrade
+opkg install mosquitto-client-nossl
+```
+
+see also https://wiki.freshtomato.org/doku.php/entware_installation_usage
+
+### tomato-mqtt
+
+Copy this whole repo into `/opt`. We assume that it resides in `/opt/tomato-mqtt/` then.
+
+For speedtest results, download the Ookla ARM CLI tool from https://install.speedtest.net/app/cli/ookla-speedtest-1.0.0-arm-linux.tgz and place its contents in a folder called `/opt/speedtest/`. The core speedtest binary (`/opt/speedtest/speedest`) should be executable.
+
+Modify the MQTT connection settings in `variables.sh` according to your server. Also add any additional mount points you may want to monitor under `disks` in this file (space-delimited). The scripts do not have to be executable.
+
+Add the following three commands under `Administration` -> `Scheduler` as custom cron jobs:
+```
+sh /opt/tomato-mqtt/collector.sh >/dev/null 2>&1
+sh /opt/tomato-mqtt/collector20.sh >/dev/null 2>&1
+sh /opt/tomato-mqtt/collector40.sh >/dev/null 2>&1
 ```
 These should all run every 1 minute on every day of the week. The collectors will now run every 20 seconds. Additionally, add this cron for the speedtest:
 ```
-sh /jffs/tomato-grafana/speedTest.sh >/dev/null 2>&1
+sh /opt/tomato-mqtt/speedTest.sh >/dev/null 2>&1
 ```
 Run this every 30 minutes, or as often as you would like results recorded.
 
-Import the Grafana dashboard via json file or from this dashboard code: https://grafana.com/grafana/dashboards/14237
+Enjoy having the data on your MQTT server!
 
-Enjoy!
+## Implementation details
+
+The function `mqtt_publish` in `variables.sh` will build a text file that contains already registered MQTT topics. If a topic doesn't exist yet, an according discovery message is sent and the topic is appended to the file. Afterwards `mqtt_publish` transfers the topic data. If a topic was already appended to the file, `mqtt_publish` only transfers the data without sending a discovery message.
+
+The text file also allows to check which topics do exists.
+
+## Deletion
+
+The above mentioned text file can also be used if you want to delete all the topics.
+
+`removeEntities.sh` can delete all topics within the file, e.g.
+```
+./removeEntities.sh FreshTomato_R7000.txt
+```
+but it also allows to delete only a single topic, e.g.
+```
+./removeEntities.sh homeassistant/sensor/CPU_temperature/config
+```

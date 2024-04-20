@@ -1,12 +1,20 @@
-#!/bin/sh                                                                                                                               
+#!/bin/sh
 
-source /jffs/tomato-grafana/variables.sh
+source variables.sh
 
-[ ! -x /jffs/speedtest/speedtest ] && exit
+[ ! -x ../speedtest/speedtest ] && exit
 
-result=`/jffs/speedtest/speedtest -f csv`
+result=`../speedtest/speedtest -f csv --accept-license --accept-gdpr`
+ping=`echo "$result" | awk -F\" '{print $6}'`
+jitter=`echo "$result" | awk -F\" '{print $8}'`
+loss=`echo "$result" | awk -F\" '{print $10}'`
 down=`echo "$result" | awk -F\" '{print $12}'`
 up=`echo "$result" | awk -F\" '{print $14}'`
 
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'speedtest.upload value='$up
-curl -XPOST 'http://'$ifserver':'$ifport'/write?db='$ifdb -u $ifuser:$ifpass --data-binary 'speedtest.download value='$down
+# calculate kbps
+down=$(($down/125))
+up=$(($up/125))
+
+mqtt_publish "speedtest ping" $ping '"icon": "mdi:timer-outline", "state_class": "measurement", "unit_of_meas": "ms", '
+mqtt_publish "speedtest upload" $up '"icon": "mdi:speedometer", "state_class": "measurement", "unit_of_meas": "kbit/s", '
+mqtt_publish "speedtest download" $down '"icon": "mdi:speedometer", "state_class": "measurement", "unit_of_meas": "kbit/s", '
