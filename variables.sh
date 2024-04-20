@@ -2,10 +2,10 @@
 disks="/tmp/mnt/SiteCom_32MB"
 
 ## MQTT connection settings
-addr="hassos.home."
 port="1883"
-username="ha_mqtt_user"
-password="DsyznlgMkqxSQ7jc"
+addr="your_hassos_address"
+username="your_ha_mqtt_username"
+password="your_ha_mqtt_password"
 
 ## MQTT topic settings
 prefix="FreshTomato"
