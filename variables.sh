@@ -44,7 +44,7 @@ mqtt_publish(){
 
         ## remember that this sensor was already registered
         echo "homeassistant/sensor/${sensor// /_}/config" >> "${prefix}_${device}.txt"
-        sleep 1 ## otherwise the first value will miss
+        sleep 1 ## otherwise the first value will be missed
     fi
 
     ## send sensor data
