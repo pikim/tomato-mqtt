@@ -61,6 +61,8 @@ The function `mqtt_publish` in `variables.sh` will build a text file that contai
 
 The text file also allows to check which topics do exists.
 
+See https://www.home-assistant.io/integrations/mqtt for details about MQTT, discovery and `mosquitto_pub` in conjunction with HomeAssistant.
+
 ## Deletion
 
 The above mentioned text file can also be used if you want to delete all the topics.
