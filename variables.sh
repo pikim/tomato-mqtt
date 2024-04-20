@@ -29,6 +29,11 @@ mqtt_publish(){
     value=$2
     optional=$3
 
+    if [ ! -f "${prefix}_${device}.txt" ]; then
+        touch "${prefix}_${device}.txt"
+        sync
+    fi
+
     if ! grep -Fqx "homeassistant/sensor/${sensor// /_}/config" "${prefix}_${device}.txt"
     then
         ## string found
