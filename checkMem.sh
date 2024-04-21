@@ -11,13 +11,13 @@ cached=`echo "$mem" | grep ^Cached: | awk '{print $2}'`
 active=`echo "$mem" | grep ^Active: | awk '{print $2}'`
 inactive=`echo "$mem" | grep ^Inactive: | awk '{print $2}'`
 
-mqtt_publish "memory free" $free '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
-mqtt_publish "memory used" $used '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
-mqtt_publish "memory total" $total '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
-mqtt_publish "memory active" $active '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
-mqtt_publish "memory cached" $cached '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
-mqtt_publish "memory buffers" $buffers '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
-mqtt_publish "memory inactive" $inactive '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+mqtt_publish "RAM free" $free '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+mqtt_publish "RAM used" $used '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+mqtt_publish "RAM total" $total '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+#mqtt_publish "RAM active" $active '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+#mqtt_publish "RAM cached" $cached '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+#mqtt_publish "RAM buffers" $buffers '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
+#mqtt_publish "RAM inactive" $inactive '"icon": "mdi:memory", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "kB", '
 
 nvram=`nvram show 2>&1 1>/dev/null | tr -cd ' 0-9'`
 nv_used=`echo $nvram | awk '{print $1}'`
