@@ -13,7 +13,7 @@ for i in $disks; do
     ## skip invalid disk names
     [ "$part" == "" ] && continue
 
-    mqtt_publish "disk $part used" $used '"icon": "mdi:harddisk", "state_class": "measurement", "device_class": "data_size", "unit_of_meas": "B", '
-    mqtt_publish "disk $part free" $free '"icon": "mdi:harddisk", "state_class": "measurement", "device_class": "data_size", "unit_of_meas": "B", '
-    mqtt_publish "disk $part total" $total '"icon": "mdi:harddisk", "state_class": "measurement", "device_class": "data_size", "unit_of_meas": "B", '
+    mqtt_publish "disk $part used" $used '"icon": "mdi:harddisk", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
+    mqtt_publish "disk $part free" $free '"icon": "mdi:harddisk", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
+    mqtt_publish "disk $part total" $total '"icon": "mdi:harddisk", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
 done
