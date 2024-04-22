@@ -41,8 +41,11 @@ mqtt_publish(){
         sleep 1 ## otherwise the first value will be missed
     fi
 
-    ## send sensor data
+    ## send sensor data via MQTT
     mosquitto_pub -h $addr -p $port -u $username -P $password -t "homeassistant/sensor/${sensor// /_}/state" -m "$value"
+
+    ## send sensor data via REST, UNTESTED!!!
+#    curl -X POST -H "Authorization: Bearer $iftoken" -H "Content-Type: application/json" -d "{\"state\":\"$value\"}" "http://${ifserver}:${ifport}/api/states/sensor.${device}_${sensor// /_}"
 }
 
 ## optional='
