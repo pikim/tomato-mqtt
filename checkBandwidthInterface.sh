@@ -13,6 +13,6 @@ for i in `\ls -A /sys/class/net/`; do
     rx=`cat /sys/class/net/$i/statistics/rx_bytes`
     tx=`cat /sys/class/net/$i/statistics/tx_bytes`
 
-    mqtt_publish "network ${i//./_} receive" $rx '"icon": "mdi:server-network", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
-    mqtt_publish "network ${i//./_} transmit" $tx '"icon": "mdi:server-network", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
+    mqtt_publish -e "network ${i//./_} receive" -s $rx -d '"icon": "mdi:server-network", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
+    mqtt_publish -e "network ${i//./_} transmit" -s $tx -d '"icon": "mdi:server-network", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B", '
 done
