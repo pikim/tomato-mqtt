@@ -13,13 +13,13 @@ ip_addr=`nvram get lan_ipaddr`
 
 ## Update an entity state
 ## -s|--state: entity value
-##       e.g. '8'.
+##      e.g. '8'.
 ## -e|--entity: entity name as string
-##       e.g. 'CPU usage'. Spaces will be replaced with underscores
-## -d|--details: additional (but optional) information for MQTT discovery, as comma terminated string
-##       e.g. '"icon": "mdi:numeric", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
-## -i|--integration: integration type if not 'sensor' (optional)
-##       e.g. "switch"
+##      e.g. 'CPU usage'. Spaces will be replaced with underscores
+## -d|--details: additional information for MQTT discovery, as comma terminated string (optional)
+##      e.g. '"icon": "mdi:numeric", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
+## -i|--integration: integration type (optional, default is 'sensor')
+##      e.g. "switch"
 mqtt_publish(){
     state=""
     entity=""
