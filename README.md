@@ -57,7 +57,7 @@ Enjoy having the data on your MQTT server!
 
 ## Implementation details
 
-Generally, it would also be possible to use the HomeAssistant REST API. But (currently) this does neither support devices, nor unique IDs.
+Generally, it would also be possible to use the HomeAssistant REST API. But (currently) this does neither support devices, nor unique IDs. Therefore MQTT is used to minimize the configuration effort on HomeAssistant side.
 
 The function `mqtt_publish` in `variables.sh` will build a text file that contains already registered MQTT topics. If a topic doesn't exist yet, an according discovery message is sent and the topic is appended to the file. Afterwards `mqtt_publish` transfers the topic data. If a topic was already appended to the text file before, `mqtt_publish` only transfers the data without sending another discovery message.
 

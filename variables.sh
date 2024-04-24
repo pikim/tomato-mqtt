@@ -26,20 +26,21 @@ mqtt_publish(){
     details=""
     integration="sensor"
 
-    # Loop through the provided arguments
+    ## Loop through the provided arguments
+    ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
     while [[ "$#" -gt 0 ]]; do
         case $1 in
-            -s|--state) state="$2" # Store the first name argument
+            -s|--state) state="$2" ## Store the first name argument
                 shift;;
-            -e|--entity) entity="$2" # Store the first name argument
+            -e|--entity) entity="$2" ## Store the first name argument
                 shift;;
-            -d|--details) details="$2" # Store the first name argument
+            -d|--details) details="$2" ## Store the first name argument
                 shift;;
-            -i|--integration) integration="$2" # Store the first name argument
+            -i|--integration) integration="$2" ## Store the first name argument
                 shift;;
-            *) echo "Unknown parameter passed: $1" # Display error for unknown parameter
+            *) echo "Unknown parameter passed: $1" ## Display error for unknown parameter
         esac
-        shift # Move to the next argument
+        shift ## Move to the next argument
     done
 
     if [ ! -f "${prefix}_${device}.txt" ]; then
