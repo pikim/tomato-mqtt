@@ -65,10 +65,13 @@ mqtt_publish(){
         sleep 1 ## otherwise the first value will be missed
     fi
 
+    if [ -n "$state" ]; then
+        ## send entity data via MQTT
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
 
-    ## send entity data via REST, UNTESTED!!!
-#    curl -X POST -H "Authorization: Bearer $iftoken" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ifserver}:${ifport}/api/states/${integration}.${device}_${entity// /_}"
+        ## send entity data via REST, UNTESTED!!!
+#        curl -X POST -H "Authorization: Bearer $iftoken" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ifserver}:${ifport}/api/states/${integration}.${device}_${entity// /_}"
+    fi
 }
 
 ## optional='
