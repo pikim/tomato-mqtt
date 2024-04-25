@@ -1,14 +1,14 @@
 #!/bin/sh
 
-source variables.sh
+. variables.sh
 
-connections=`cat /proc/net/nf_conntrack`
-tcp=`echo "$connections" | grep ipv4 | grep tcp | wc -l`
-udp=`echo "$connections" | grep ipv4 | grep udp | wc -l`
-icmp=`echo "$connections" | grep ipv4 | grep icmp | wc -l`
-total=`echo "$connections" | grep ipv4 | wc -l`
+connections=$(cat /proc/net/nf_conntrack)
+tcp=$(echo "$connections" | grep ipv4 | grep -c tcp)
+udp=$(echo "$connections" | grep ipv4 | grep -c udp)
+icmp=$(echo "$connections" | grep ipv4 | grep -c icmp)
+total=$(echo "$connections" | grep -c ipv4)
 
-mqtt_publish -e "connections TCP count" -s $tcp -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
-mqtt_publish -e "connections UDP count" -s $udp -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
-mqtt_publish -e "connections ICMP count" -s $icmp -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
-mqtt_publish -e "connections total count" -s $total -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
+mqtt_publish -e "connections TCP count" -s "$tcp" -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
+mqtt_publish -e "connections UDP count" -s "$udp" -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
+mqtt_publish -e "connections ICMP count" -s "$icmp" -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
+mqtt_publish -e "connections total count" -s "$total" -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '

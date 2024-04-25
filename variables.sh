@@ -1,14 +1,16 @@
+#!/bin/sh
+
 ## read custom configuration
-source config.sh
+. config.sh
 
 ## MQTT topic settings
 prefix="FreshTomato"
-device=`nvram get t_fix1`
-version=`nvram get os_version`
-ip_addr=`nvram get lan_ipaddr`
+device=$(nvram get t_fix1)
+version=$(nvram get os_version)
+ip_addr=$(nvram get lan_ipaddr)
 
-[ `nvram get https_enable` -eq "1" ] && cfg_url="https://$ip_addr"
-[ `nvram get http_enable` -eq "1" ] && cfg_url="http://$ip_addr"
+[ "$(nvram get https_enable)" = "1" ] && cfg_url="https://$ip_addr"
+[ "$(nvram get http_enable)" = "1" ] && cfg_url="http://$ip_addr"
 
 
 ## Update an entity state
@@ -28,7 +30,7 @@ mqtt_publish(){
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
-    while [[ "$#" -gt 0 ]]; do
+    while [ "$#" -gt 0 ]; do
         case $1 in
             -s|--state) state="$2" ## Store the first name argument
                 shift;;
@@ -54,15 +56,14 @@ mqtt_publish(){
 #    else
         ## string not found, entity wasn't registered yet
         ## announce entity
-        mosquitto_pub -h $addr -p $port -u $username -P $password -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $details \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $details \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
         ## remember that this entity was already registered
         echo "homeassistant/${integration}/${entity// /_}/config" >> "${prefix}_${device}.txt"
         sleep 1 ## otherwise the first value will be missed
     fi
 
-    ## send entity data via MQTT
-    mosquitto_pub -h $addr -p $port -u $username -P $password -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
 
     ## send entity data via REST, UNTESTED!!!
 #    curl -X POST -H "Authorization: Bearer $iftoken" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ifserver}:${ifport}/api/states/${integration}.${device}_${entity// /_}"

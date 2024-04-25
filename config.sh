@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ## any additional mount points to monitor here, space delimited like "/jffs /nfs"
 disks="/tmp/mnt/sda1"
 

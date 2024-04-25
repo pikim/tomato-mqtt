@@ -1,7 +1,7 @@
 #!/bin/sh
 
-source variables.sh
+. variables.sh
 
-clients=`arp -an | grep -v vlan2 | wc -l`
+clients=$(arp -an | grep -cv vlan2)
 
-mqtt_publish -e "clients count" -s $clients -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
+mqtt_publish -e "clients count" -s "$clients" -d '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic", '
