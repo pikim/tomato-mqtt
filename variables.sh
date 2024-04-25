@@ -13,6 +13,11 @@ ip_addr=$(nvram get lan_ipaddr)
 [ "$(nvram get http_enable)" = "1" ] && cfg_url="http://$ip_addr"
 
 
+## define file name and create file if it doesn't exist
+entity_file="${prefix}_${device}.txt"
+touch "$entity_file"
+
+
 ## Update an entity state
 ## -s|--state: entity value
 ##      e.g. '8'.
@@ -45,12 +50,7 @@ mqtt_publish(){
         shift ## Move to the next argument
     done
 
-    if [ ! -f "${prefix}_${device}.txt" ]; then
-        touch "${prefix}_${device}.txt"
-        sync
-    fi
-
-    if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "${prefix}_${device}.txt"; then
+    if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "$entity_file"; then
         ## string found
 #    else
         ## string not found, entity wasn't registered yet
@@ -60,7 +60,7 @@ mqtt_publish(){
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $details \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
         ## remember that this entity was already registered
-        echo "homeassistant/${integration}/${entity// /_}/config" >> "${prefix}_${device}.txt"
+        echo "homeassistant/${integration}/${entity// /_}/config" >> "$entity_file"
         sleep 1 ## otherwise the first value will be missed
     fi
 
