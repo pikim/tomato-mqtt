@@ -50,8 +50,7 @@ mqtt_publish(){
         sync
     fi
 
-    if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "${prefix}_${device}.txt"
-    then
+    if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "${prefix}_${device}.txt"; then
         ## string found
 #    else
         ## string not found, entity wasn't registered yet
