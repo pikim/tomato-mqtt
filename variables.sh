@@ -21,7 +21,7 @@ ip_addr=$(nvram get lan_ipaddr)
 ## -d|--details: additional information for MQTT discovery, as comma terminated string (optional)
 ##      e.g. '"icon": "mdi:numeric", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
 ## -i|--integration: integration type (optional, default is 'sensor')
-##      e.g. "switch"
+##      e.g. "binary_sensor", "sensor" or "switch"
 mqtt_publish(){
     state=""
     entity=""
@@ -56,6 +56,8 @@ mqtt_publish(){
 #    else
         ## string not found, entity wasn't registered yet
         ## announce entity
+#        echo "homeassistant/${integration}/${entity// /_}/config"
+#        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $details \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $details \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
         ## remember that this entity was already registered
