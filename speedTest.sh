@@ -15,6 +15,6 @@ up=$(echo "$result" | awk -F\" '{print $14}')
 down=$((down/125))
 up=$((up/125))
 
-mqtt_publish -e "speedtest ping" -s "$ping" -d '"icon": "mdi:timer-outline", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "ms", '
-mqtt_publish -e "speedtest upload" -s "$up" -d '"icon": "mdi:speedometer", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "kbit/s", '
-mqtt_publish -e "speedtest download" -s "$down" -d '"icon": "mdi:speedometer", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "kbit/s", '
+mqtt_publish -e "speedtest ping" -s "$ping" -d '"icon": "mdi:timer-outline", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "ms",'
+mqtt_publish -e "speedtest upload" -s "$up" -d '"icon": "mdi:speedometer", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "kbit/s",'
+mqtt_publish -e "speedtest download" -s "$down" -d '"icon": "mdi:speedometer", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "kbit/s",'
