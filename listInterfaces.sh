@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo `\ls -A /sys/class/net/`
+echo $(ls -A /sys/class/net/)
