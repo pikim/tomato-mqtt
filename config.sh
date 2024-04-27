@@ -9,7 +9,7 @@ addr="your_hassos_address"
 username="your_ha_mqtt_username"
 password="your_ha_mqtt_password"
 
-## REST connection settings
-ifport="8123"
-ifserver="your_hassos_address"
-iftoken="your_unique_token"
+## REST API connection settings
+ra_port="8123"
+ra_server="your_hassos_address"
+ra_token="your_unique_token"
