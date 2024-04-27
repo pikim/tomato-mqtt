@@ -11,5 +11,5 @@ password="your_ha_mqtt_password"
 
 ## REST API connection settings
 ra_port="8123"
-ra_server="your_hassos_address"
+ra_addr="your_hassos_address"
 ra_token="your_unique_token"

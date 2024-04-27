@@ -84,7 +84,7 @@ mqtt_publish(){
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
 
         ## send entity data via REST, UNTESTED!!!
-#        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_server}:${ra_port}/api/states/${integration}.${device}_${entity// /_}"
+#        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}"
     fi
 
     if [ -n "$attributes" ]; then
@@ -130,7 +130,7 @@ rest_get(){
     done
 
 
-    curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_server}:${ra_port}/api/states/${integration}.${device}_${entity// /_}" | jq -r ".${property}"
+    curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}" | jq -r ".${property}"
 }
 
 ## curl get response:
