@@ -67,8 +67,6 @@ mqtt_publish(){
     fi
 
     if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "$entity_file"; then
-        ## string found
-#    else
         ## string not found, entity wasn't registered yet
         ## announce entity
 #        echo "homeassistant/${integration}/${entity// /_}/config"
