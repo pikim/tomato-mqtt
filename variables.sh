@@ -129,7 +129,8 @@ rest_get(){
         shift ## Move to the next argument
     done
 
-
+#    echo "Authorization: Bearer $ra_token"
+#    echo "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}"
     curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}" | jq -r ".${property}"
 }
 
