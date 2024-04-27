@@ -94,9 +94,9 @@ mqtt_publish(){
 }
 
 ## optional='
-## "icon": "mdi:numeric", 
-## "state_class": "measurement", 
-## "device_class": "temperature", 
-## "unit_of_meas": "°C", 
-## "entity_category": "diagnostic", 
+## "icon": "mdi:numeric",
+## "state_class": "measurement",
+## "device_class": "temperature",
+## "unit_of_meas": "°C",
+## "entity_category": "diagnostic",
 ## '
