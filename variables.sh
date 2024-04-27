@@ -66,11 +66,12 @@ mqtt_publish(){
 
         ## remember that this entity was already registered
         echo "homeassistant/${integration}/${entity// /_}/config" >> "$entity_file"
+        echo "created $entity"
         sleep 1 ## otherwise the first value will be missed
     fi
 
     if [ -n "$state" ]; then
-        ## send entity data via MQTT
+        ## send entity state via MQTT
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
 
         ## send entity data via REST, UNTESTED!!!
