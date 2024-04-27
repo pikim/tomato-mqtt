@@ -21,6 +21,7 @@ touch "$entity_file"
 ## Update an entity state
 ## -s|--state: entity value
 ##      e.g. '8'.
+## -d|--delete: true to delete an entity
 ## -e|--entity: entity name as string
 ##      e.g. 'CPU usage'. Spaces will be replaced with underscores
 ## -o|--options: additional information for MQTT discovery, as comma terminated string (optional)
@@ -35,12 +36,15 @@ mqtt_publish(){
     options=""
     attributes=""
     integration="sensor"
+    delete=false
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
     while [ "$#" -gt 0 ]; do
         case $1 in
             -s|--state) state="$2" ## Store the first name argument
+                shift;;
+            -d|--delete) delete="$2" ## Store the first name argument
                 shift;;
             -e|--entity) entity="$2" ## Store the first name argument
                 shift;;
@@ -54,6 +58,13 @@ mqtt_publish(){
         esac
         shift ## Move to the next argument
     done
+
+    if [ "$delete" = true ]; then
+        topic="homeassistant/${integration}/${entity// /_}/config"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$topic" -m ""
+        sed -i "\;$topic;d" "${entity_file}"
+        return 0
+    fi
 
     if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "$entity_file"; then
         ## string found
