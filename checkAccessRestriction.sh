@@ -16,6 +16,7 @@ while IFS= read -r rrule; do
     name=$(echo "$rrule" | awk -F"=" '{print $1}')
     desc=$(echo "$rrule" | awk -F"|" '{print $NF}')
     enable_old=$(echo "$rrule" | awk -F"[=|]" '{print $2}')
+#    echo "$name  $desc  $enable_old"
 
     ## delete rrule if it's empty (no | in string)
     if [[ "$rrule" != *"|"* ]]; then
@@ -53,7 +54,8 @@ while IFS= read -r rrule; do
     ## replace the old rule with the new one
     nvram set "$rrule"
 
-    ## remember that something has changed
+    ## notify and remember that something has changed
+    echo "$name has changed"
     changed=true
 done <<EOF
 $rrules
