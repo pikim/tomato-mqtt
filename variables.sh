@@ -100,3 +100,38 @@ mqtt_publish(){
 ## "unit_of_meas": "°C",
 ## "entity_category": "diagnostic",
 ## '
+
+
+## Update an entity state
+## -e|--entity: entity name as string
+##      e.g. 'CPU usage'. Spaces will be replaced with underscores
+## -p|--property: property to read (optional, default is 'state')
+##      e.g. 'last_changed', state, ...
+## -i|--integration: integration type (optional, default is 'sensor')
+##      e.g. "binary_sensor", "sensor", "switch", ...
+rest_get(){
+    entity=""
+    property="state"
+    integration="sensor"
+
+    ## Loop through the provided arguments
+    ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
+    while [ "$#" -gt 0 ]; do
+        case $1 in
+            -e|--entity) entity="$2" ## Store the first name argument
+                shift;;
+            -p|--property) property="$2" ## Store the first name argument
+                shift;;
+            -i|--integration) integration="$2" ## Store the first name argument
+                shift;;
+            *) echo "Unknown parameter passed: $1" ## Display error for unknown parameter
+        esac
+        shift ## Move to the next argument
+    done
+
+
+    curl -X GET -s -H "Authorization: Bearer $iftoken" -H "Content-Type: application/json" "http://${ifserver}:${ifport}/api/states/${integration}.${device}_${entity// /_}" | jq -r ".${property}"
+}
+
+## curl get response:
+## {"entity_id":"sensor.r6400v2_clients_count","state":"12","attributes":{},"last_changed":"2024-04-22T21:17:06.724753+00:00","last_updated":"2024-04-22T21:17:06.724753+00:00","context":{"id":"01HW3TPVS4RYPXA3XVK0CG36B8","parent_id":null,"user_id":"0a5940fde5564d5b9e4baf64acdd78a7"}}
