@@ -23,8 +23,6 @@ while IFS= read -r rrule; do
         mqtt_publish -e "$name" -i "switch" -d true
         nvram unset "$name"
         continue
-    else
-        echo $(echo "$rrule" | awk -F"=" '{print $1}')
     fi
 
     if ! grep -q "$name" "${entity_file}"; then
@@ -37,7 +35,7 @@ while IFS= read -r rrule; do
     mqtt_publish -e "$name" -i "switch" -a "{\"Rule description\": \"$desc\"}"
 
     ## get the desired state
-    enable_new=$(rest_get -e $name -i "switch")
+    enable_new=$(rest_get -e "$name" -i "switch")
 
     ## convert on and off into 1 and 0
     case $enable_new in
