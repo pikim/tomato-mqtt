@@ -25,12 +25,15 @@ touch "$entity_file"
 ##      e.g. 'CPU usage'. Spaces will be replaced with underscores
 ## -o|--options: additional information for MQTT discovery, as comma terminated string (optional)
 ##      e.g. '"icon": "mdi:numeric", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
+## -a|--attributes: attributes for the entity (optional)
+##      e.g. '"rule_name": "Block Server"'
 ## -i|--integration: integration type (optional, default is 'sensor')
 ##      e.g. "binary_sensor", "sensor" or "switch"
 mqtt_publish(){
     state=""
     entity=""
     options=""
+    attributes=""
     integration="sensor"
 
     ## Loop through the provided arguments
@@ -42,6 +45,8 @@ mqtt_publish(){
             -e|--entity) entity="$2" ## Store the first name argument
                 shift;;
             -o|--options) options="$2" ## Store the first name argument
+                shift;;
+            -a|--attributes) attributes="$2" ## Store the first name argument
                 shift;;
             -i|--integration) integration="$2" ## Store the first name argument
                 shift;;
@@ -57,7 +62,7 @@ mqtt_publish(){
         ## announce entity
 #        echo "homeassistant/${integration}/${entity// /_}/config"
 #        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity// /_}/attributes\", $options \"unique_id\": \"${prefix}_${device}_${entity// /_}\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
         ## remember that this entity was already registered
         echo "homeassistant/${integration}/${entity// /_}/config" >> "$entity_file"
@@ -70,6 +75,11 @@ mqtt_publish(){
 
         ## send entity data via REST, UNTESTED!!!
 #        curl -X POST -H "Authorization: Bearer $iftoken" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ifserver}:${ifport}/api/states/${integration}.${device}_${entity// /_}"
+    fi
+
+    if [ -n "$attributes" ]; then
+        ## send entity attributes via MQTT
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/attributes" -m "$attributes"
     fi
 }
 
