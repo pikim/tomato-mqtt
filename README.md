@@ -57,7 +57,7 @@ It should run every 1 minute on every day of the week. The collectors will now r
 
 Additionally, add this cron for the speedtest:
 ```
-sh /opt/tomato-mqtt/speedTest.sh >/dev/null 2>&1
+sh /opt/tomato-mqtt/speedTestStart.sh >/dev/null 2>&1
 ```
 Run this every 30 minutes, or as often as you would like results recorded.
 
