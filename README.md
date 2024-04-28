@@ -67,7 +67,7 @@ Enjoy having the data on your MQTT server!
 
 The scripts collect the relevant data on the router itself. When data preparation has finished the data is transferred via MQTT. The function `mqtt_publish` in `variables.sh` will build a text file that contains already registered MQTT topics, e.g. `FreshTomato_R6400v2.txt`. If a topic doesn't exist yet, an according discovery message is sent and the topic is appended to the file. Afterwards `mqtt_publish` transfers the topic data and/or topic attribute(s). If a topic was already appended to the text file earlier, `mqtt_publish` only transfers the data without sending another discovery message.
 
-In addition to this mechanism `checkAccessRestriction.sh` uses `rest_get` in `variables.sh` to request the states of the access restriction switches. If the desired state differs from the current state the rule is updated and applied.
+In addition to this mechanism `checkAccessRestriction.sh` uses `rest_get` in `variables.sh` to request the states of the access restriction switches. If the desired state (on Home Assistant) differs from the current state (on router) the according rule is updated and applied.
 
 The text file (`FreshTomato_R6400v2.txt`) allows to check which topics already do exists. Its content is like:
 ```
