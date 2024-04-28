@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Absolute path to this script: /opt/tomato-mqtt/collectorSingle.sh
+# Absolute path to this script: /opt/tomato-mqtt/speedTestStart.sh
 SCRIPT=$(readlink -f $0)
 # Absolute path this script is in: /opt/tomato-mqtt
 SCRIPTPATH=$(dirname $SCRIPT)
