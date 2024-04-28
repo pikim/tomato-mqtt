@@ -31,7 +31,7 @@ Install entware
 /usr/sbin/entware-install.sh
 ```
 
-Update, upgrade and install the desired package(s)
+Update, upgrade and install the required package(s)
 ```
 opkg update
 opkg upgrade
@@ -39,7 +39,7 @@ opkg install coreutils-readlink
 opkg install mosquitto-client-nossl
 ```
 
-see also https://wiki.freshtomato.org/doku.php/entware_installation_usage
+See also https://wiki.freshtomato.org/doku.php/entware_installation_usage
 
 ### tomato-mqtt
 
@@ -81,7 +81,7 @@ The above mentioned text file can also be used if you want to delete all the top
 ```
 sh /opt/tomato-mqtt/removeEntities.sh FreshTomato_R7000.txt
 ```
-but it also allows to delete only a single topic, e.g.
+It also allows to delete only a single topic, e.g.
 ```
 sh /opt/tomato-mqtt/removeEntities.sh homeassistant/sensor/CPU_temperature/config
 ```
