@@ -1,3 +1,3 @@
 #!/bin/sh
 sleep 40
-./collector.sh
+sh "$SCRIPTPATH/collector.sh"
