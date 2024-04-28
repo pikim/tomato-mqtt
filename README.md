@@ -8,9 +8,9 @@ Developped on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https:
 
 - transfers data using MQTT and supports MQTT discovery on HomeAssistant
 - collects various router metrics and sends them to a HomeAssistant server
+- the router pushes and pulls data - without exposing any interface on router side
 - allows to enable/disable access restriction rules from within HomeAssistant
 - allows to enable/disable the adblocker from within HomeAssistant (upcoming feature)
-- the router pushes and pulls data - without exposing any interface on router side
 
 ## Requirements
 
