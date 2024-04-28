@@ -47,7 +47,7 @@ Copy this whole repo into `/opt`. We assume that it resides in `/opt/tomato-mqtt
 
 For speedtest results, download the Ookla ARM CLI tool from https://install.speedtest.net/app/cli/ookla-speedtest-1.0.0-arm-linux.tgz and place its contents in a folder called `/opt/speedtest/`. The core speedtest binary (`/opt/speedtest/speedest`) should be executable.
 
-Modify the MQTT connection settings in `config.sh` according to your server. Also add any additional mount points you may want to monitor under `disks` in this file (space-delimited). The scripts do not have to be executable.
+Modify the MQTT connection settings in `config.sh` according to your server. Also add any additional mount points you may want to monitor under `disks` in this file (space-delimited). The scripts do not have to be executable. Check the first couple of lines in `variables.sh` whether they seem plausible to you.
 
 Add the following command under `Administration` -> `Scheduler` as custom cron job:
 ```
@@ -65,13 +65,30 @@ Enjoy having the data on your MQTT server!
 
 ## Implementation details
 
-Generally, it would also be possible to use the HomeAssistant REST API. But (currently) this does neither support devices, nor unique IDs. Therefore MQTT is used to minimize the configuration effort on HomeAssistant side.
+The scripts collect the relevant data on the router itself. When data preparation has finished the data is transferred via MQTT. The function `mqtt_publish` in `variables.sh` will build a text file that contains already registered MQTT topics, e.g. `FreshTomato_R6400v2.txt`. If a topic doesn't exist yet, an according discovery message is sent and the topic is appended to the file. Afterwards `mqtt_publish` transfers the topic data and/or topic attribute(s). If a topic was already appended to the text file earlier, `mqtt_publish` only transfers the data without sending another discovery message.
 
-The function `mqtt_publish` in `variables.sh` will build a text file that contains already registered MQTT topics. If a topic doesn't exist yet, an according discovery message is sent and the topic is appended to the file. Afterwards `mqtt_publish` transfers the topic data. If a topic was already appended to the text file before, `mqtt_publish` only transfers the data without sending another discovery message.
+In addition to this mechanism `checkAccessRestriction.sh` uses `rest_get` in `variables.sh` to request the states of the access restriction switches. If the desired state differs from the current state the rule is updated and applied.
 
-The text file also allows to check which topics do exists.
+The text file (`FreshTomato_R6400v2.txt`) allows to check which topics already do exists. Its content is like:
+```
+homeassistant/sensor/CPU_temperature/config
+homeassistant/sensor/CPU_usage/config
+homeassistant/sensor/RAM_free/config
+homeassistant/sensor/RAM_used/config
+...
+```
 
 See https://www.home-assistant.io/integrations/mqtt for details about MQTT, discovery and `mosquitto_pub` in conjunction with HomeAssistant.
+
+Generally, it would also be possible to use the HomeAssistant REST API. But (currently) this does neither support devices, nor unique IDs. Therefore MQTT is used to minimize the configuration effort on HomeAssistant side.
+
+## Troubleshooting
+
+Enter the directoy (`cd /opt/tomato-mqtt`) and execute the scripts manually, e.g. `sh checkCPU.sh` to see error messages. Don't forget to check the MQTT section in Home Assistant afterwards - the device and entities should have been created or updated. For debugging it can be helpful to add a `echo` call to print the content of a variable in the console, e.g.
+```
+cpuTemp=$(grep -o '[0-9]\+' /proc/dmu/temperature)
+echo "$cpuTemp"
+```
 
 ## Deletion
 
