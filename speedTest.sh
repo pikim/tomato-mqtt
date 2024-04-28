@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. variables.sh
+. "${SCRIPTPATH}/variables.sh"
 
 [ ! -x ../speedtest/speedtest ] && exit
 

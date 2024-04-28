@@ -1,7 +1,9 @@
 #!/bin/sh
 
+folder="${SCRIPTPATH}"
+
 ## read custom configuration
-. config.sh
+. "$folder/config.sh"
 
 ## MQTT topic settings
 prefix="FreshTomato"
@@ -14,7 +16,7 @@ ip_addr=$(nvram get lan_ipaddr)
 
 
 ## define file name and create file if it doesn't exist
-entity_file="${prefix}_${device}.txt"
+entity_file="${folder}/${prefix}_${device}.txt"
 touch "$entity_file"
 
 

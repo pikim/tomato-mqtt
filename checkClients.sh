@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. variables.sh
+. "${SCRIPTPATH}/variables.sh"
 
 clients=$(arp -an | grep -cv vlan2)
 

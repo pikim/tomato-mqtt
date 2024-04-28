@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. variables.sh
+. "${SCRIPTPATH}/variables.sh"
 
 for i in $disks; do
     used=0

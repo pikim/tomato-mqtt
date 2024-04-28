@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. variables.sh
+. "${SCRIPTPATH}/variables.sh"
 
 mem=$(cat /proc/meminfo)
 total=$(echo "$mem" | grep ^MemTotal | awk '{print $2}')
