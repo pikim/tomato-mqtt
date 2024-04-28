@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
 changed=false
 

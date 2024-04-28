@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
 load=$(cat /proc/loadavg)
 load1=$(echo "$load" | awk '{print $1}')

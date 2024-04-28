@@ -1,10 +1,10 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
-[ ! -x ../speedtest/speedtest ] && exit
+[ ! -x "${SCRIPTPATH}../speedtest/speedtest" ] && exit
 
-result=$(../speedtest/speedtest -f csv --accept-license --accept-gdpr)
+result=$("${SCRIPTPATH}../speedtest/speedtest" -f csv --accept-license --accept-gdpr)
 ping=$(echo "$result" | awk -F\" '{print $6}')
 jitter=$(echo "$result" | awk -F\" '{print $8}')
 loss=$(echo "$result" | awk -F\" '{print $10}')

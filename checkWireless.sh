@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
 eth1Temp=$(($(wl -i eth1 phy_tempsense|awk '{print $1}')/2+20))
 eth2Temp=$(($(wl -i eth2 phy_tempsense|awk '{print $1}')/2+20))

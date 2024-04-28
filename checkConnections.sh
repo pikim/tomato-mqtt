@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
 connections=$(cat /proc/net/nf_conntrack)
 tcp=$(echo "$connections" | grep ipv4 | grep -c tcp)

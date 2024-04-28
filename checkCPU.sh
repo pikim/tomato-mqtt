@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
 cpuTemp=$(grep -o '[0-9]\+' /proc/dmu/temperature)
 

@@ -9,7 +9,4 @@ SCRIPTPATH=$(dirname $SCRIPT)
 # with trailing / because that way it also works directly from folder
 export SCRIPTPATH="${SCRIPTPATH}/"
 
-sh "${SCRIPTPATH}collector0.sh" &
-#sh "${SCRIPTPATH}collector20.sh" &
-sh "${SCRIPTPATH}collector30.sh" &
-#sh "${SCRIPTPATH}collector40.sh" &
+sh "${SCRIPTPATH}speedTest.sh"

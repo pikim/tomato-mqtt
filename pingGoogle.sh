@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "${SCRIPTPATH}/variables.sh"
+. "${SCRIPTPATH}variables.sh"
 
 googleping=$(ping -c 10 www.google.com | tail -2)
 packet=$(echo "$googleping" | tr ',' '\n' | grep "packet loss" | grep -o '[0-9]\+')

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sh "$SCRIPTPATH/collector.sh"
+sh "${SCRIPTPATH}collector.sh"
