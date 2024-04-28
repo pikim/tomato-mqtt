@@ -2,7 +2,15 @@
 
 Scripts to capture metrics from routers running FreshTomato. Developped for HomeAssistant with MQTT plugin (supports discovery). With slight modifications it should also run without HomeAssistant.
 
-Developed on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https://github.com/ch604/tomato-grafana).
+Developped on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https://github.com/ch604/tomato-grafana).
+
+## Features
+
+- transfers data using MQTT and supports MQTT discovery on HomeAssistant
+- collects various router metrics and sends them to a HomeAssistant server
+- allows to enable/disable access restriction rules from within HomeAssistant
+- allows to enable/disable the adblocker from within HomeAssistant (upcoming feature)
+- the router pushes and pulls data - without exposing any interface on router side
 
 ## Requirements
 
@@ -15,8 +23,7 @@ Developed on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https:/
 
 Connect and mount a USB drive to the FreshTomato router
 ```
-mkdir /mnt/sda1/opt
-mount -o bind /mnt/sda1/opt /opt
+mount --bind /tmp/mnt/sda1 /opt
 ```
 
 Install entware
@@ -28,6 +35,7 @@ Update, upgrade and install the desired package(s)
 ```
 opkg update
 opkg upgrade
+opkg install coreutils-readlink
 opkg install mosquitto-client-nossl
 ```
 
@@ -39,15 +47,15 @@ Copy this whole repo into `/opt`. We assume that it resides in `/opt/tomato-mqtt
 
 For speedtest results, download the Ookla ARM CLI tool from https://install.speedtest.net/app/cli/ookla-speedtest-1.0.0-arm-linux.tgz and place its contents in a folder called `/opt/speedtest/`. The core speedtest binary (`/opt/speedtest/speedest`) should be executable.
 
-Modify the MQTT connection settings in `variables.sh` according to your server. Also add any additional mount points you may want to monitor under `disks` in this file (space-delimited). The scripts do not have to be executable.
+Modify the MQTT connection settings in `config.sh` according to your server. Also add any additional mount points you may want to monitor under `disks` in this file (space-delimited). The scripts do not have to be executable.
 
-Add the following three commands under `Administration` -> `Scheduler` as custom cron jobs:
+Add the following command under `Administration` -> `Scheduler` as custom cron job:
 ```
-sh /opt/tomato-mqtt/collector.sh >/dev/null 2>&1
-sh /opt/tomato-mqtt/collector20.sh >/dev/null 2>&1
-sh /opt/tomato-mqtt/collector40.sh >/dev/null 2>&1
+sh /opt/tomato-mqtt/collectorStart.sh >/dev/null 2>&1
 ```
-These should all run every 1 minute on every day of the week. The collectors will now run every 20 seconds. Additionally, add this cron for the speedtest:
+It should run every 1 minute on every day of the week. The collectors will now run every 20 or 30 seconds. You can adjust the interval in `collectorStart.sh`.
+
+Additionally, add this cron for the speedtest:
 ```
 sh /opt/tomato-mqtt/speedTest.sh >/dev/null 2>&1
 ```
@@ -71,9 +79,9 @@ The above mentioned text file can also be used if you want to delete all the top
 
 `removeEntities.sh` can delete all topics within the file, e.g.
 ```
-./removeEntities.sh FreshTomato_R7000.txt
+sh /opt/tomato-mqtt/removeEntities.sh FreshTomato_R7000.txt
 ```
 but it also allows to delete only a single topic, e.g.
 ```
-./removeEntities.sh homeassistant/sensor/CPU_temperature/config
+sh /opt/tomato-mqtt/removeEntities.sh homeassistant/sensor/CPU_temperature/config
 ```
