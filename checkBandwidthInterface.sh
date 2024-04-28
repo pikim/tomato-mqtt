@@ -1,8 +1,8 @@
 #!/bin/sh
 
-ignore="dpsta ifb0 ifb1 ifb2 ifb3"
-
 . "${SCRIPTPATH}/variables.sh"
+
+ignore="dpsta ifb0 ifb1 ifb2 ifb3"
 
 for i in $(ls -A /sys/class/net/); do
     ## skip interfaces from ignore list
