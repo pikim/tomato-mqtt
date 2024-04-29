@@ -43,8 +43,8 @@ while IFS= read -r rrule; do
     case $enable_new in
         "on") enable_new="1" ;;
         "off") enable_new="0" ;;
-        *) echo "Unknown parameter passed: \"$enable_new\". Setting it to 0 instead."
-            enable_new="0" ;;
+        *) echo "Unknown parameter passed: \"$enable_new\". Setting it to \"1\" instead."
+            enable_new="1" ;;
     esac
 #    echo "$enable_old $enable_new"
 
