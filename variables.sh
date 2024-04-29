@@ -6,6 +6,8 @@ folder="${SCRIPTPATH}"
 . "${folder}config.sh"
 
 ## MQTT topic settings
+#retain=""
+retain="-r"
 prefix="FreshTomato"
 device=$(nvram get t_fix1)
 version=$(nvram get os_version)
@@ -63,7 +65,7 @@ mqtt_publish(){
 
     if [ "$delete" = true ]; then
         topic="homeassistant/${integration}/${entity// /_}/config"
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$topic" -m ""
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "$topic" -m ""
         sed -i "\;$topic;d" "${entity_file}"
         return 0
     fi
@@ -73,7 +75,7 @@ mqtt_publish(){
         ## announce entity
 #        echo "homeassistant/${integration}/${entity// /_}/config"
 #        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity// /_}/attributes\", $options \"unique_id\": \"${prefix}_${device}_${entity// /_}\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity// /_}/attributes\", $options \"unique_id\": \"${prefix}_${device}_${entity// /_}\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
         ## remember that this entity was already registered
         echo "homeassistant/${integration}/${entity// /_}/config" >> "$entity_file"
@@ -83,7 +85,7 @@ mqtt_publish(){
 
     if [ -n "$state" ]; then
         ## send entity state via MQTT
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
 
         ## send entity data via REST, UNTESTED!!!
 #        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}"
@@ -91,7 +93,7 @@ mqtt_publish(){
 
     if [ -n "$attributes" ]; then
         ## send entity attributes via MQTT
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/attributes" -m "$attributes"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/attributes" -m "$attributes"
     fi
 }
 
