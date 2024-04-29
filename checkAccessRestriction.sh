@@ -16,6 +16,7 @@ while IFS= read -r rrule; do
     name=$(echo "$rrule" | awk -F"=" '{print $1}')
     desc=$(echo "$rrule" | awk -F"|" '{print $NF}')
     enable_old=$(echo "$rrule" | awk -F"[=|]" '{print $2}')
+    integration="switch"
 #    echo "$name  $desc  $enable_old"
 
     ## delete rrule if it's empty (no | in string)
@@ -28,7 +29,7 @@ while IFS= read -r rrule; do
 
     if ! grep -q "$name" "${entity_file}"; then
         ## create topic and continue with next rule
-        mqtt_publish -e "$name" -i "switch" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:eye\","
+        mqtt_publish -e "$name" -i "$integration" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:eye\","
         continue
     fi
 
