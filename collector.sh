@@ -1,8 +1,8 @@
 #!/bin/sh
 
 sh "${SCRIPTPATH}checkCPU.sh"
-sh "${SCRIPTPATH}checkAdBlock.sh"
-sh "${SCRIPTPATH}checkAccessRestriction.sh"
+sh "${SCRIPTPATH}checkAdBlock.sh" &
+sh "${SCRIPTPATH}checkAccessRestriction.sh" &
 sh "${SCRIPTPATH}checkBandwidthInterface.sh" &
 sh "${SCRIPTPATH}checkConnections.sh" &
 sh "${SCRIPTPATH}checkWireless.sh" &
