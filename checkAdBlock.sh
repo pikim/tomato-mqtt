@@ -13,7 +13,7 @@ fi
 
 if ! grep -q "$name" "${entity_file}"; then
     ## create topic
-    mqtt_publish -e "$name" -i "$integration" -s "$enable_old" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:eye\","
+    mqtt_publish -e "$name" -i "$integration" -s "$enable_old" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:advertisements-off\","
 fi
 
 ## get the desired state

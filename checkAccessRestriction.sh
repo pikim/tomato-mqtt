@@ -29,7 +29,7 @@ while IFS= read -r rrule; do
 
     if ! grep -q "$name" "${entity_file}"; then
         ## create topic and continue with next rule
-        mqtt_publish -e "$name" -i "$integration" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:eye\","
+        mqtt_publish -e "$name" -i "$integration" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:network-off-outline\","
         continue
     fi
 
