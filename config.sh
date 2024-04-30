@@ -3,6 +3,9 @@
 ## any additional mount points to monitor here, space delimited like "/jffs /nfs"
 disks="/tmp/mnt/sda1"
 
+## any additional hosts to ping here, space delimited like "www.google.com www.bing.com"
+hosts="www.google.com"
+
 ## MQTT connection settings
 port="1883"
 addr="your_hassos_address"
