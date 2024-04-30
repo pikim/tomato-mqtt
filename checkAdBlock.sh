@@ -17,7 +17,7 @@ if ! grep -q "$name" "${entity_file}"; then
 fi
 
 ## get the desired state
-enable_new=$(rest_get -e "$name" -i "switch")
+enable_new=$(rest_get -e "$name" -i "$integration")
 
 ## convert on and off
 case $enable_new in

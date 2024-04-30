@@ -22,7 +22,7 @@ while IFS= read -r rrule; do
     ## delete rrule if it's empty (no | in string)
     if [[ "$rrule" != *"|"* ]]; then
         echo "deleting $name"
-        mqtt_publish -e "$name" -i "switch" -d true
+        mqtt_publish -e "$name" -i "$integration" -d true
         nvram unset "$name"
         continue
     fi
@@ -34,10 +34,10 @@ while IFS= read -r rrule; do
     fi
 
     ## update MQTT attributes with current rule name
-    mqtt_publish -e "$name" -i "switch" -a "{\"Rule description\": \"$desc\"}"
+    mqtt_publish -e "$name" -i "$integration" -a "{\"Rule description\": \"$desc\"}"
 
     ## get the desired state
-    enable_new=$(rest_get -e "$name" -i "switch")
+    enable_new=$(rest_get -e "$name" -i "$integration")
 
     ## convert on and off into 1 and 0
     case $enable_new in
