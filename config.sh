@@ -4,7 +4,7 @@
 disks="/tmp/mnt/sda1"
 
 ## any additional hosts to ping here, space delimited like "www.google.com www.bing.com"
-hosts="www.google.com"
+hosts="google.com"
 
 ## MQTT connection settings
 port="1883"
