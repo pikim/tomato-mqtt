@@ -28,6 +28,8 @@ touch "$entity_file"
 ## -d|--delete: true to delete an entity
 ## -e|--entity: entity name as string
 ##      e.g. 'CPU usage'. Spaces will be replaced with underscores
+## -f|--friendly: friendly name as string
+##      e.g. 'CPU usage'
 ## -o|--options: additional information for MQTT discovery, as comma terminated string (optional)
 ##      e.g. '"icon": "mdi:numeric", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
 ## -a|--attributes: attributes for the entity (optional)
@@ -38,6 +40,7 @@ mqtt_publish(){
     state=""
     entity=""
     options=""
+    friendly=""
     attributes=""
     integration="sensor"
     delete=false
@@ -54,6 +57,8 @@ mqtt_publish(){
                 shift;;
             -o|--options) options="$2" ## Store the first name argument
                 shift;;
+            -f|--friendly) friendly="$2" ## Store the first name argument
+                shift;;
             -a|--attributes) attributes="$2" ## Store the first name argument
                 shift;;
             -i|--integration) integration="$2" ## Store the first name argument
@@ -62,6 +67,10 @@ mqtt_publish(){
         esac
         shift ## Move to the next argument
     done
+
+    if [ "$friendly" = "" ]; then
+        friendly="$entity"
+    fi
 
     ## format/create variables
     entity="${entity// /_}"
@@ -79,9 +88,8 @@ mqtt_publish(){
         ## string not found, entity wasn't registered yet
         ## announce entity
 #        echo "homeassistant/${integration}/${entity}/config"
-#        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"unique_id\": \"${prefix}_${device}_${entity}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-
+#        echo "{\"name\": \"$friendly\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/config" -m "{\"name\": \"$friendly\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
         ## remember that this entity was already registered
         echo "homeassistant/${integration}/${entity}/config" >> "$entity_file"
