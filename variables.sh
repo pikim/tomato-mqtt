@@ -13,6 +13,7 @@ device=$(nvram get t_fix1)
 version=$(nvram get os_version)
 ip_addr=$(nvram get lan_ipaddr)
 
+## set https or http as protocol
 [ "$(nvram get https_enable)" = "1" ] && cfg_url="https://$ip_addr"
 [ "$(nvram get http_enable)" = "1" ] && cfg_url="http://$ip_addr"
 
