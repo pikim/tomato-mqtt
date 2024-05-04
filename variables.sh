@@ -62,7 +62,11 @@ mqtt_publish(){
         esac
         shift ## Move to the next argument
     done
+
+    ## format/create variables
     entity="${entity// /_}"
+    object_id="${device}_${entity}"
+    unique_id="${prefix}_${device}_${entity}"
 
     if [ "$delete" = true ]; then
         topic="homeassistant/${integration}/${entity}/config"
@@ -76,7 +80,7 @@ mqtt_publish(){
         ## announce entity
 #        echo "homeassistant/${integration}/${entity}/config"
 #        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"unique_id\": \"${prefix}_${device}_${entity}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"unique_id\": \"${prefix}_${device}_${entity}\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
 
 
         ## remember that this entity was already registered
