@@ -62,38 +62,40 @@ mqtt_publish(){
         esac
         shift ## Move to the next argument
     done
+    entity="${entity// /_}"
 
     if [ "$delete" = true ]; then
-        topic="homeassistant/${integration}/${entity// /_}/config"
+        topic="homeassistant/${integration}/${entity}/config"
         mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "$topic" -m ""
         sed -i "\;$topic;d" "${entity_file}"
         return 0
     fi
 
-    if ! grep -Fqx "homeassistant/${integration}/${entity// /_}/config" "$entity_file"; then
+    if ! grep -Fqx "homeassistant/${integration}/${entity}/config" "$entity_file"; then
         ## string not found, entity wasn't registered yet
         ## announce entity
-#        echo "homeassistant/${integration}/${entity// /_}/config"
-#        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"unique_id\": \"${prefix}_${device}_${entity// /_}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity// /_}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity// /_}/attributes\", $options \"unique_id\": \"${prefix}_${device}_${entity// /_}\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+#        echo "homeassistant/${integration}/${entity}/config"
+#        echo "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"unique_id\": \"${prefix}_${device}_${entity}\", $options \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/config" -m "{\"name\": \"$entity\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"unique_id\": \"${prefix}_${device}_${entity}\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
+
 
         ## remember that this entity was already registered
-        echo "homeassistant/${integration}/${entity// /_}/config" >> "$entity_file"
+        echo "homeassistant/${integration}/${entity}/config" >> "$entity_file"
         echo "created $entity"
         sleep 1 ## otherwise the first value will be missed
     fi
 
     if [ -n "$state" ]; then
         ## send entity state via MQTT
-        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/state" -m "$state"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/state" -m "$state"
 
         ## send entity data via REST, UNTESTED!!!
-#        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}"
+#        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}"
     fi
 
     if [ -n "$attributes" ]; then
         ## send entity attributes via MQTT
-        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity// /_}/attributes" -m "$attributes"
+        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/attributes" -m "$attributes"
     fi
 }
 
@@ -133,9 +135,11 @@ rest_get(){
         shift ## Move to the next argument
     done
 
+    entity="${entity// /_}"
+
 #    echo "Authorization: Bearer $ra_token"
-#    echo "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}"
-    curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity// /_}" | jq -r ".${property}"
+#    echo "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}"
+    curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}" | jq -r ".${property}"
 }
 
 ## curl get response:
