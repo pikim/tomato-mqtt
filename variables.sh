@@ -18,7 +18,7 @@ ip_addr=$(nvram get lan_ipaddr)
 [ "$(nvram get http_enable)" = "1" ] && cfg_url="http://$ip_addr"
 
 
-## define file name and create file if it doesn't exist
+## define file name(s) and create file(s) if it do(es)n't exist
 entity_file="${folder}${prefix}_${device}.txt"
 touch "$entity_file"
 
@@ -70,6 +70,7 @@ mqtt_publish(){
     done
 
     if [ "$friendly" = "" ]; then
+        ## no friendly name given, use entity name
         friendly="$entity"
     fi
 
@@ -86,7 +87,7 @@ mqtt_publish(){
     fi
 
     if ! grep -Fqx "homeassistant/${integration}/${entity}/config" "$entity_file"; then
-        ## string not found, entity wasn't registered yet
+        ## string not found in file, entity wasn't registered yet
         ## announce entity
 #        echo "homeassistant/${integration}/${entity}/config"
 #        echo "{\"name\": \"$friendly\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
