@@ -19,6 +19,9 @@ while IFS= read -r rrule; do
     integration="switch"
 #    echo "$name  $desc  $enable_old"
 
+    ## skip dummy rrule
+    [[ "$name" = "rrule0" ]] && continue
+
     ## delete rrule if it's empty (no | in string)
     if [[ "$rrule" != *"|"* ]]; then
         echo "deleting $name"
