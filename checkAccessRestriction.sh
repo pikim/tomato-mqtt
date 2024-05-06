@@ -4,6 +4,10 @@
 
 changed=false
 
+## define and create a file for the friendly names
+friendly_file="${folder}${prefix}_${device}_friendly.txt"
+touch "$friendly_file"
+
 ## get all the rules
 rrules=$(nvram show 2> /dev/null | grep -E "rrule[0-9]+")
 #echo $rrules
@@ -30,9 +34,30 @@ while IFS= read -r rrule; do
         continue
     fi
 
+    friendly_line=$(grep -F "$name \"" "$friendly_file")
+    if [ "$friendly_line" = "" ]; then
+        ## friendly name not stored, store it now
+        friendly="$desc"
+        echo "$name \"$friendly\"" >> "$friendly_file"
+    else
+        ## friendly name was already stored, get it
+        friendly=$(echo "$friendly_line" | awk -F'"' '{ print $2 }')
+
+        ## delete topic if friendly name has changed
+        if [ "$desc" != "$friendly" ]; then
+            mqtt_publish -e "$name" -i "$integration" -d true
+            sed -i "\;$friendly_line;d" "$friendly_file"
+            echo "rename $friendly to $desc"
+            friendly="$desc"
+            echo "$name \"$friendly\"" >> "$friendly_file"
+        fi
+    fi
+#    echo "$name \"$friendly\""
+
+    ## check if topic was already created before
     if ! grep -q "$name" "${entity_file}"; then
         ## create topic and continue with next rule
-        mqtt_publish -e "$name" -i "$integration" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:network-off-outline\","
+        mqtt_publish -e "$name" -f "$friendly" -i "$integration" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:network-off-outline\","
         continue
     fi
 
