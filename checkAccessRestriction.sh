@@ -30,6 +30,7 @@ while IFS= read -r rrule; do
     if [[ "$rrule" != *"|"* ]]; then
         echo "deleting $name"
         mqtt_publish -e "$name" -i "$integration" -d true
+        sed -i "/$name /d" "$friendly_file"
         nvram unset "$name"
         continue
     fi
