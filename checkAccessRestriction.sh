@@ -47,10 +47,9 @@ while IFS= read -r rrule; do
         ## delete topic if friendly name has changed
         if [ "$desc" != "$friendly" ]; then
             mqtt_publish -e "$name" -i "$integration" -d true
-            sed -i "\;$friendly_line;d" "$friendly_file"
             echo "rename $friendly to $desc"
             friendly="$desc"
-            echo "$name \"$friendly\"" >> "$friendly_file"
+            sed -i "s%$friendly_line%$name \"$friendly\"%g" "$friendly_file"
         fi
     fi
 #    echo "$name \"$friendly\""
