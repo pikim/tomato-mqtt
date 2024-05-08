@@ -57,12 +57,12 @@ while IFS= read -r rrule; do
     ## check if topic was already created before
     if ! grep -q "$name" "${entity_file}"; then
         ## create topic and continue with next rule
-        mqtt_publish -e "$name" -f "$friendly" -i "$integration" -s "$enable_old" -a "{\"Rule description\": \"$desc\"}" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:network-off-outline\","
+        mqtt_publish -e "$name" -f "$friendly" -i "$integration" -s "$enable_old" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:network-off-outline\","
         continue
     fi
 
     ## update MQTT attributes with current rule name
-    mqtt_publish -e "$name" -i "$integration" -a "{\"Rule description\": \"$desc\"}"
+#    mqtt_publish -e "$name" -i "$integration" -a "{\"Rule description\": \"$desc\", \"Rule name\": \"$name\"}"
 
     ## get the desired state
     enable_new=$(rest_get -e "$name" -i "$integration")
