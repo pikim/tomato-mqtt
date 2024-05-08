@@ -6,7 +6,7 @@ changed=false
 
 ## define and create a file for the friendly names
 friendly_file="${folder}${prefix}_${device}_friendly.txt"
-touch "$friendly_file"
+[ ! -e "$friendly_file" ] && touch "$friendly_file"
 
 ## get all the rules
 rrules=$(nvram show 2> /dev/null | grep -E "rrule[0-9]+")

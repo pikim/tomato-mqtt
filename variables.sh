@@ -20,7 +20,7 @@ ip_addr=$(nvram get lan_ipaddr)
 
 ## define file name(s) and create file(s) if it do(es)n't exist
 entity_file="${folder}${prefix}_${device}.txt"
-touch "$entity_file"
+[ ! -e "$entity_file" ] && touch "$entity_file"
 
 
 ## Update an entity state
