@@ -27,5 +27,6 @@ if [ -f "$1" ]; then
     fi
 else
     echo "Removing single sensor $1"
-    mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "$1" -m ''
+    mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "$1" -m ""
+    sed -i "\;$1;d" "${entity_file}"
 fi
