@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Performs the OOKLA speedtest and determines download and upload speeds and the ping
+# time.
+
 . "${SCRIPTPATH}variables.sh"
 
 [ ! -x "${SCRIPTPATH}../speedtest/speedtest" ] && exit

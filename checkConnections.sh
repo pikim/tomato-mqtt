@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Checks the number of open connections.
+
 . "${SCRIPTPATH}variables.sh"
 
 connections=$(cat /proc/net/nf_conntrack)

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Checks some memory informations of attached disk(s). Add the disks of interest to the
+# variable `disks` (space separated) in `config.sh` and make sure they are mounted.
+# Find the path(s) to be added using the last column of the `df` command output.
+
 . "${SCRIPTPATH}variables.sh"
 
 for i in $disks; do

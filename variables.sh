@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Holds the base functionality for all the other scripts..
+
 folder="${SCRIPTPATH}"
 
 ## read custom configuration
@@ -23,7 +25,7 @@ entity_file="${folder}${prefix}_${device}.txt"
 [ ! -e "$entity_file" ] && touch "$entity_file"
 
 
-## Update an entity state
+## Publish an entity state
 ## -s|--state: entity value
 ##      e.g. '8'.
 ## -d|--delete: true to delete an entity
@@ -72,10 +74,13 @@ mqtt_publish(){
     if [ "$friendly" = "" ]; then
         ## no friendly name given, use entity name
         friendly="$entity"
+        entity="${entity// /_}"
+    else
+        ## friendly name given
+        entity="${entity// /_}"
     fi
 
-    ## format/create variables
-    entity="${entity// /_}"
+    ## create variables
     object_id="${device}_${entity}"
     unique_id="${prefix}_${device}_${entity}"
 
@@ -122,7 +127,7 @@ mqtt_publish(){
 ## '
 
 
-## Update an entity state
+## Get an entity state
 ## -e|--entity: entity name as string
 ##      e.g. 'CPU usage'. Spaces will be replaced with underscores
 ## -p|--property: property to read (optional, default is 'state')

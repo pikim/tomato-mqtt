@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Checks the 1m, 5m and 15m CPU load and the uptime. Can be extended to also check the
+# number of running CPU processes and last process ID.
+
 . "${SCRIPTPATH}variables.sh"
 
 load=$(cat /proc/loadavg)

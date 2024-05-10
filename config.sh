@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Holds custom credentials, disks and hosts.
+# !!! DO NOT SHARE THIS FILE WITH OTHER PERSONS !!!
+
 ## any additional mount points to monitor here, space delimited like "/jffs /nfs"
 disks="/tmp/mnt/sda1"
 

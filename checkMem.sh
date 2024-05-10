@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Checks some memory informations of RAM and NVRAM.
+
 . "${SCRIPTPATH}variables.sh"
 
 mem=$(cat /proc/meminfo)

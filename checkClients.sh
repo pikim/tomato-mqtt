@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Checks the number of connected clients.
+
 . "${SCRIPTPATH}variables.sh"
 
 clients=$(arp -an | grep -cv vlan2)

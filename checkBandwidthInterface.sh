@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Checks the number of bytes transferred on each interface. Ignores all interfaces from
+# `/sys/class/net` which were added to the variable `ignore` (space separated) below.
+# `listInterfaces.sh` shows a list of the interfaces.
+
 . "${SCRIPTPATH}variables.sh"
 
 ignore="dpsta ifb0 ifb1 ifb2 ifb3"

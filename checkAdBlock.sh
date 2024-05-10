@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# On first execution it creates a switch integration to enable and disable the routers
+# AdBlock service from within Home Assistant.
+# On subsequent execution it checks the state of the switch and enables or disables the
+# service accordingly.
+
 . "${SCRIPTPATH}variables.sh"
 
 name="AdBlock"

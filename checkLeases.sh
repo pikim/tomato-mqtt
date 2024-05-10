@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Checks the leases file for known clients and tries to determine their connectivity
+# state by pinging them.
+
 . "${SCRIPTPATH}variables.sh"
 
 ping_client(){

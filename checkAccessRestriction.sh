@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# On first execution it creates switch integrations to enable and disable the routers
+# access restriction rules from within Home Assistant.
+# On subsequent execution it checks the state of the switches and enables or disables
+# each rule accordingly. It creates an additional file, ending with `_friendly.txt` to
+# track the (friendly) names of the access restriction rules.
+
 . "${SCRIPTPATH}variables.sh"
 
 changed=false

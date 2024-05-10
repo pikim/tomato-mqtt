@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Checks the connectivity of hosts by pinging them. Add the hosts of interest to the
+# variable `hosts` (space separated) in `config.sh`
+
 . "${SCRIPTPATH}variables.sh"
 
 ping_host(){

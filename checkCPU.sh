@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Checks the CPU temperature and CPU usage in percent. Should not be executed in parallel
+# with the other script as its result will be distorted otherwise.
+
 . "${SCRIPTPATH}variables.sh"
 
 cpuTemp=$(grep -o '[0-9]\+' /proc/dmu/temperature)

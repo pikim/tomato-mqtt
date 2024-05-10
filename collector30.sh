@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# Runs collector script after 30 seconds.
+
 sleep 30
 #sh "${SCRIPTPATH}collector.sh"
 
