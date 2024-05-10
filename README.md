@@ -25,6 +25,7 @@ Connect and mount a USB drive to the FreshTomato router
 ```
 mount --bind /tmp/mnt/sda1 /opt
 ```
+To automatically mount the drive, activate `automount` on the `USB support` page and add the above line to `Run after mounting`.
 
 Install entware
 ```
