@@ -41,6 +41,7 @@ while IFS= read -r rrule; do
         continue
     fi
 
+#    friendly=$(rest_get -e "$name" -i "$integration" -p "attributes.friendly_name" | sed "s%$device %%g")
     friendly_line=$(grep -F "$name \"" "$friendly_file")
     if [ "$friendly_line" = "" ]; then
         ## friendly name not stored, store it now
