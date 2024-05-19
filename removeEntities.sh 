@@ -17,7 +17,7 @@ if [ -f "$1" ]; then
     while IFS="" read -r p || [ -n "$p" ]
     do
 #        printf '%s\n' "$p"
-        mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "$p" -m ''
+        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$p" -m ''
     done < "$1"
 
     echo "Entities from '$1' have been deleted."
@@ -30,6 +30,6 @@ if [ -f "$1" ]; then
     fi
 else
     echo "Removing single sensor $1"
-    mosquitto_pub "$retain" -h "$addr" -p "$port" -u "$username" -P "$password" -t "$1" -m ""
+    mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$1" -m ""
     sed -i "\;$1;d" "${entity_file}"
 fi
