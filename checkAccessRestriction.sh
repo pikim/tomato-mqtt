@@ -72,7 +72,7 @@ while IFS= read -r rrule; do
 #    mqtt_publish -e "$name" -i "$integration" -a "{\"Rule description\": \"$desc\", \"Rule name\": \"$name\"}"
 
     ## get the desired state
-    enable_new=$(rest_get -e "$name" -i "$integration")
+    enable_new=$(rest_get -e "$name" -i "$integration" -p "state")
 
     ## convert on and off into 1 and 0
     case $enable_new in

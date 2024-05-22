@@ -136,7 +136,7 @@ mqtt_publish(){
 ##      e.g. "binary_sensor", "sensor", "switch", ...
 rest_get(){
     entity=""
-    property="state"
+    property=""
     integration="sensor"
 
     ## Loop through the provided arguments

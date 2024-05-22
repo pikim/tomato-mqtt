@@ -22,7 +22,7 @@ if ! grep -q "$name" "${entity_file}"; then
 fi
 
 ## get the desired state
-enable_new=$(rest_get -e "$name" -i "$integration")
+enable_new=$(rest_get -e "$name" -i "$integration" -p "state")
 
 ## convert on and off
 case $enable_new in
