@@ -2,7 +2,7 @@
 
 # Checks the WiFi temperature(s) and noise level(s).
 
-. "${SCRIPTPATH}variables.sh"
+. "./common.sh"
 
 eth1Temp=$(($(wl -i eth1 phy_tempsense|awk '{print $1}')/2+20))
 eth2Temp=$(($(wl -i eth2 phy_tempsense|awk '{print $1}')/2+20))

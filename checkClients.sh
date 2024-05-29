@@ -2,7 +2,7 @@
 
 # Checks the number of connected clients.
 
-. "${SCRIPTPATH}variables.sh"
+. "./common.sh"
 
 clients=$(arp -an | grep -cv vlan2)
 

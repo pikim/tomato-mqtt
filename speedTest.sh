@@ -3,14 +3,14 @@
 # Performs the OOKLA speedtest and determines download and upload speeds and the ping
 # time.
 
-. "${SCRIPTPATH}variables.sh"
+. "./common.sh"
 
-[ ! -x "${SCRIPTPATH}../speedtest/speedtest" ] && exit
+[ ! -x "../speedtest/speedtest" ] && exit
 
-result=$("${SCRIPTPATH}../speedtest/speedtest" -f csv --accept-license --accept-gdpr)
+result=$("../speedtest/speedtest" -f csv --accept-license --accept-gdpr)
 ping=$(echo "$result" | awk -F\" '{print $6}')
-jitter=$(echo "$result" | awk -F\" '{print $8}')
-loss=$(echo "$result" | awk -F\" '{print $10}')
+#jitter=$(echo "$result" | awk -F\" '{print $8}')
+#loss=$(echo "$result" | awk -F\" '{print $10}')
 down=$(echo "$result" | awk -F\" '{print $12}')
 up=$(echo "$result" | awk -F\" '{print $14}')
 #url=$(echo "$result" | awk -F\" '{print $29}')

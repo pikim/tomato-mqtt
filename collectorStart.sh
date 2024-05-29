@@ -4,15 +4,16 @@
 # Can be directly called from the UI scheduler.
 
 ## Absolute path to this script: /opt/tomato-mqtt/collectorStart.sh
-SCRIPT=$(readlink -f $0)
+SCRIPT=$(readlink -f "$0")
 ## Absolute path this script is in: /opt/tomato-mqtt
-SCRIPTPATH=$(dirname $SCRIPT)
+SCRIPTPATH=$(dirname "$SCRIPT")
+## Change into that directory
+cd "$SCRIPTPATH" || return
 
-## export it for the other scripts
-## with trailing / because that way it also works directly from folder
-export SCRIPTPATH="${SCRIPTPATH}/"
+sh "./collector0.sh" &
+#sh "./collector20.sh" &
+sh "./collector30.sh" &
+#sh "./collector40.sh" &
 
-sh "${SCRIPTPATH}collector0.sh" &
-#sh "${SCRIPTPATH}collector20.sh" &
-sh "${SCRIPTPATH}collector30.sh" &
-#sh "${SCRIPTPATH}collector40.sh" &
+## Change into initial directory
+cd - || return

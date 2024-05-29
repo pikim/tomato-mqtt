@@ -1,0 +1,24 @@
+{"template": "
+{% set device_name = '' %}
+{% set devices = states | map(attribute='entity_id') | map('device_id') | unique | reject('eq',None) | list %}
+{% set ns = namespace(devices = []) %}
+{% for device in devices %}
+    {% set data = namespace(entities=[]) %}
+    {% set entities = device_entities(device) | list | sort %}
+    {% if entities and device_name in device_attr(device, 'name') %}
+        {% for entity in entities %}
+            {% set ip_address = state_attr(entity, 'ip_address') %}
+            {% if ip_address %}
+                {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name'), 'ip_address': state_attr(entity, 'ip_address')} %}
+            {% elif 'switch.' in entity %}
+                {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name'), 'state': states(entity)} %}
+            {% else %}
+                {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name')} %}
+            {% endif %}
+            {% set data.entities = data.entities + [entity_meta] %}
+        {% endfor %}
+        {% set ns.devices = ns.devices + [ {device: {'name': device_attr(device, 'name'), 'entities': data.entities}} ] %}
+    {% endif %}
+{% endfor %}
+{{ ns.devices }}
+"}

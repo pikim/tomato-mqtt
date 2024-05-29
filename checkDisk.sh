@@ -4,7 +4,7 @@
 # variable `disks` (space separated) in `config.sh` and make sure they are mounted.
 # Find the path(s) to be added using the last column of the `df` command output.
 
-. "${SCRIPTPATH}variables.sh"
+. "./common.sh"
 
 for i in $disks; do
     used=0

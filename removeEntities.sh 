@@ -3,7 +3,7 @@
 # Removes entities from Home Assistant. Either works with a whole entity file or with a
 # single entity, e.g. `homeassistant/sensor/CPU_temperature/config`.
 
-. "${SCRIPTPATH}variables.sh"
+. "./common.sh"
 
 if [ -f "$1" ]; then
     echo -n "Do you wish to delete all entities? (y/n) "

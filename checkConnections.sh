@@ -2,7 +2,7 @@
 
 # Checks the number of open connections.
 
-. "${SCRIPTPATH}variables.sh"
+. "./common.sh"
 
 connections=$(cat /proc/net/nf_conntrack)
 tcp=$(echo "$connections" | grep ipv4 | grep -c tcp)

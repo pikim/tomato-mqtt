@@ -1,11 +1,9 @@
 #!/bin/sh
 
-# Holds the base functionality for all the other scripts..
-
-folder="${SCRIPTPATH}"
+# Holds the base functionality and variables for all the other scripts.
 
 ## read custom configuration
-. "${folder}config.sh"
+. "./config.sh"
 
 ## MQTT topic settings
 retain=""
@@ -19,10 +17,46 @@ ip_addr=$(nvram get lan_ipaddr)
 [ "$(nvram get https_enable)" = "1" ] && cfg_url="https://$ip_addr"
 [ "$(nvram get http_enable)" = "1" ] && cfg_url="http://$ip_addr"
 
+## file settings
+file_prefix="/tmp/${prefix}_${device}"
+entity_file="${file_prefix}.json"
+twig_file="${file_prefix}.twig"
+pid_file="${file_prefix}.pid"
 
-## define file name(s) and create file(s) if it do(es)n't exist
-entity_file="${folder}${prefix}_${device}.txt"
-[ ! -e "$entity_file" ] && touch "$entity_file"
+
+## source everything except the variables only once
+[ -n "${sourced_variables_sh+x}" ] && return
+sourced_variables_sh=true
+
+
+## Fetch device entities from Home Assistant
+fetch_entities(){
+    echo "Fetching device entities from Home Assistant"
+    ## locking taken from https://gist.github.com/didenko/a92beec14ce2ca1c98f3
+    exec 221>"${pid_file}"
+    flock --exclusive 221
+    echo ${$}>&221
+
+    ## update device_name in template.twig
+    sed "s/{% set device_name =.*/{% set device_name = '$device' %}/g" "template.twig" > "$twig_file"
+
+    ## request entities
+    curl -X POST "http://${ra_addr}:${ra_port}/api/template" \
+        -H "Authorization: Bearer $ra_token" \
+        -H "Content-Type: application/json" \
+        -d @"$twig_file" \
+        > "$entity_file"
+
+    ## replace single with double quotes and format file
+    sed -i "s/'/\"/g" "$entity_file"
+    content=$(jq '.' "$entity_file") && echo "$content" > "$entity_file"
+
+    ## critical part finished, unlock
+    flock --unlock 221
+}
+
+## execute function
+fetch_entities
 
 
 ## Publish an entity state
@@ -74,39 +108,34 @@ mqtt_publish(){
     if [ "$friendly" = "" ]; then
         ## no friendly name given, use entity name
         friendly="$entity"
-        entity="${entity// /_}"
-    else
-        ## friendly name given
-        entity="${entity// /_}"
     fi
+    entity="${entity// /_}"
 
-    ## create variables
-    object_id="${device}_${entity}"
-    unique_id="${prefix}_${device}_${entity}"
+    ## define topics once and reuse them
+    cfg_topic="homeassistant/${integration}/${entity}/config"
+    attr_topic="homeassistant/${integration}/${entity}/attributes"
+    state_topic="homeassistant/${integration}/${entity}/state"
 
     if [ "$delete" = true ]; then
-        topic="homeassistant/${integration}/${entity}/config"
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$topic" -m ""
-        sed -i "\;$topic;d" "${entity_file}"
-        return 0
+        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$cfg_topic" -m ""
+        return
     fi
 
-    if ! grep -Fqx "homeassistant/${integration}/${entity}/config" "$entity_file"; then
+    if ! grep -Fiqx "${integration}.${device}_${entity}" "$entity_file"; then
+        ## create variables
+        object_id="${device}_${entity}"
+        unique_id="${prefix}_${device}_${entity}"
+
         ## string not found in file, entity wasn't registered yet
         ## announce entity
-#        echo "homeassistant/${integration}/${entity}/config"
-#        echo "{\"name\": \"$friendly\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/config" -m "{\"name\": \"$friendly\", \"state_topic\": \"homeassistant/${integration}/${entity}/state\", \"json_attributes_topic\": \"homeassistant/${integration}/${entity}/attributes\", $options \"object_id\": \"$object_id\", \"unique_id\": \"$unique_id\", \"device\": {\"identifiers\": [\"$prefix $device\"], \"name\": \"$device\", \"configuration_url\": \"$cfg_url\", \"sw_version\": \"$version\"}}"
-
-        ## remember that this entity was already registered
-        echo "homeassistant/${integration}/${entity}/config" >> "$entity_file"
-        echo "created $entity"
-        sleep 1 ## otherwise the first value will be missed
+#        echo "$cfg_topic"
+#        echo "{\"name\": \"${friendly}\", \"state_topic\": \"${state_topic}\", \"json_attributes_topic\": \"${attr_topic}\", ${options} \"object_id\": \"${object_id}\", \"unique_id\": \"${unique_id}\", \"device\": {\"identifiers\": [\"${prefix} ${device}\"], \"name\": \"${device}\", \"configuration_url\": \"${cfg_url}\", \"sw_version\": \"${version}\"}}"
+        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$cfg_topic" -m "{\"name\": \"${friendly}\", \"state_topic\": \"${state_topic}\", \"json_attributes_topic\": \"${attr_topic}\", ${options} \"object_id\": \"${object_id}\", \"unique_id\": \"${unique_id}\", \"device\": {\"identifiers\": [\"${prefix} ${device}\"], \"name\": \"${device}\", \"configuration_url\": \"${cfg_url}\", \"sw_version\": \"${version}\"}}"
     fi
 
     if [ -n "$state" ]; then
         ## send entity state via MQTT
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/state" -m "$state"
+        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$state_topic" -m "$state"
 
         ## send entity data via REST, UNTESTED!!!
 #        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}"
@@ -114,7 +143,7 @@ mqtt_publish(){
 
     if [ -n "$attributes" ]; then
         ## send entity attributes via MQTT
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "homeassistant/${integration}/${entity}/attributes" -m "$attributes"
+        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$attr_topic" -m "$attributes"
     fi
 }
 

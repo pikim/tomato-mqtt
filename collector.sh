@@ -3,15 +3,23 @@
 # Determine the order of the scripts and whether they are executed synchronously at the
 # same time (line ending with `&`) or asynchronously one after the other.
 
-sh "${SCRIPTPATH}checkCPU.sh"
-sh "${SCRIPTPATH}checkMem.sh" &
-sh "${SCRIPTPATH}checkDisk.sh" &
-sh "${SCRIPTPATH}checkLoad.sh" &
-sh "${SCRIPTPATH}checkPing.sh" &
-sh "${SCRIPTPATH}checkLeases.sh" &
-sh "${SCRIPTPATH}checkClients.sh" &
-sh "${SCRIPTPATH}checkWireless.sh" &
-sh "${SCRIPTPATH}checkConnections.sh" &
-sh "${SCRIPTPATH}checkBandwidthInterface.sh" &
-sh "${SCRIPTPATH}checkAccessRestriction.sh" &
-sh "${SCRIPTPATH}checkAdBlock.sh" &
+# It's not recommended to also run checkCPU.sh synchronously as this will distort its
+# results. If this is intended anyhow, it's highly recommended to source variables.sh
+# first by uncommenting the following line.
+
+. "./common.sh"
+
+. "./checkCPU.sh"
+. "./checkMem.sh" &
+. "./checkDisk.sh" &
+. "./checkLoad.sh" &
+. "./checkPing.sh" &
+. "./checkLeases.sh" &
+. "./checkClients.sh" &
+. "./checkWireless.sh" &
+. "./checkConnections.sh" &
+. "./checkBandwidthInterface.sh" &
+. "./checkAccessRestriction.sh" &
+. "./checkAdBlock.sh" &
+
+wait
