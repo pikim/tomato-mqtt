@@ -38,7 +38,9 @@ fetch_entities(){
     echo ${$}>&221
 
     ## update device_name in template.twig
-    sed "s/{% set device_name =.*/{% set device_name = '$device' %}/g" "template.twig" > "$twig_file"
+    if [ ! -e "$twig_file" ]; then
+        sed "s/{% set device_name =.*/{% set device_name = '$device' %}/g" "template.twig" > "$twig_file"
+    fi
 
     ## request entities
     curl -X POST "http://${ra_addr}:${ra_port}/api/template" \
