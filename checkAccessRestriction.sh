@@ -36,7 +36,7 @@ while IFS= read -r rrule; do
     state=$(echo "$meta" | jq -r '.state')
 
     ## delete rrule if it's empty (no | in string)
-    if echo "$rrule" | grep -q "|" 2>/dev/null; then
+    if ! echo "$rrule" | grep -q "|" 2>/dev/null; then
         echo "Deleting empty rule $name"
         mqtt_publish -e "$name" -i "$integration" -d true
         nvram unset "$name"
