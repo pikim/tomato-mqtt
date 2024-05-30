@@ -32,7 +32,7 @@ while IFS= read -r rrule; do
 
     ## get the desired friendly name and state from json
     meta=$(jq ". | select(.friendly_name == \"$desc\")" "$entity_file")
-    friendly=$(echo "$meta" | jq -r '.friendly_name' | cut -d" " -f2-)
+    friendly=$(echo "$meta" | jq -r '.friendly_name')
     state=$(echo "$meta" | jq -r '.state')
 
     ## delete rrule if it's empty (no | in string)

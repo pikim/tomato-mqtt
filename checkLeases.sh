@@ -24,8 +24,8 @@ process_active_clients(){
     client_addr="$2"
 
     ## fetch meta data by friendly name (including the device prefix) and remove the device prefix
-    meta=$(echo "$leases" | jq -r ". | select(.friendly_name == \"$device $client_name\")")
-    friendly=$(echo "$meta" | jq -r '.friendly_name' | cut -d" " -f2-)
+    meta=$(echo "$leases" | jq -r ". | select(.friendly_name == \"$client_name\")")
+    friendly=$(echo "$meta" | jq -r '.friendly_name')
     address=$(echo "$meta" | jq -r '.ip_address')
     entity=$(echo "$meta" | jq -r '.entity')
 
@@ -101,7 +101,7 @@ done < "${file_prefix}.handled"
 echo "Starting to ping inactive clients"
 echo "$leases" | jq -c '.' | while read -r lease; do
 #    echo "$lease"
-    friendly=$(echo "$lease" | jq -r '.friendly_name' | cut -d" " -f2-)
+    friendly=$(echo "$lease" | jq -r '.friendly_name')
     address=$(echo "$lease" | jq -r '.ip_address')
 
     process_inactive_clients "$friendly" "$address" &
