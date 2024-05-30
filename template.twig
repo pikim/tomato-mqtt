@@ -12,10 +12,14 @@
                 {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name'), 'ip_address': state_attr(entity, 'ip_address')} %}
             {% elif 'switch.' in entity %}
                 {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name'), 'state': states(entity)} %}
+{#
             {% else %}
                 {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name')} %}
+#}
             {% endif %}
-            {% set data.entities = data.entities + [entity_meta] %}
+            {% if entity_meta | default(false) %}
+                {% set data.entities = data.entities + [entity_meta] %}
+            {% endif %}
         {% endfor %}
         {% set ns.devices = ns.devices + [ {device: {'name': device_attr(device, 'name'), 'entities': data.entities}} ] %}
     {% endif %}
