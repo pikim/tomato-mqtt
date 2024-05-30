@@ -19,7 +19,8 @@ ip_addr=$(nvram get lan_ipaddr)
 
 ## file settings
 file_prefix="/tmp/${prefix}_${device}"
-entity_file="${file_prefix}.json"
+entity_file="${file_prefix}.jsonl"
+json_file="${file_prefix}.json"
 twig_file="${file_prefix}.twig"
 pid_file="${file_prefix}.pid"
 
@@ -47,11 +48,16 @@ fetch_entities(){
         -H "Authorization: Bearer $ra_token" \
         -H "Content-Type: application/json" \
         -d @"$twig_file" \
-        > "$entity_file"
+        > "$json_file"
 
-    ## replace single with double quotes and format file
-    sed -i "s/'/\"/g" "$entity_file"
-    content=$(jq '.' "$entity_file") && echo "$content" > "$entity_file"
+    ## replace single with double quotes (and format file)
+    sed -i "s/'/\"/g" "$json_file"
+#    content=$(jq '.' "$json_file") && echo "$content" > "$json_file"
+
+    ## convert to jsonl with only the most relevant data without device name in friendly name
+    device_id=$(jq ".[] | keys[]" "$json_file")
+    jq -c ".[][$device_id].entities[]" "$json_file" > "$entity_file"
+    sed -i "s/friendly_name\":\"$device /friendly_name\":\"/g" "$entity_file"
 
     ## critical part finished, unlock
     flock --unlock 221

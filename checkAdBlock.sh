@@ -19,8 +19,7 @@ else
 fi
 
 ## get the desired state
-device_id=$(jq ".[] | keys[]" "$entity_file")
-meta=$(jq ".[][$device_id].entities[] | select(.friendly_name == \"$device $name\")" "$entity_file")
+meta=$(jq ". | select(.friendly_name == \"$name\")" "$entity_file")
 state=$(echo "$meta" | jq -r '.state')
 
 ## create topic if it doesn't exist

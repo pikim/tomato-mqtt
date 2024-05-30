@@ -31,8 +31,7 @@ while IFS= read -r rrule; do
     [ "$name" = "rrule0" ] && continue
 
     ## get the desired friendly name and state from json
-    device_id=$(jq ".[] | keys[]" "$entity_file")
-    meta=$(jq ".[][$device_id].entities[] | select(.friendly_name == \"$device $desc\")" "$entity_file")
+    meta=$(jq ". | select(.friendly_name == \"$desc\")" "$entity_file")
     friendly=$(echo "$meta" | jq -r '.friendly_name' | cut -d" " -f2-)
     state=$(echo "$meta" | jq -r '.state')
 

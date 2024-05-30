@@ -11,8 +11,7 @@ sync
 
 
 ## get the device ID and all its entities with an ip_address
-device_id=$(jq ".[] | keys[]" "$entity_file")
-leases=$(jq ".[][$device_id].entities[] | select(.ip_address != null)" "$entity_file")
+leases=$(jq ". | select(.ip_address != null)" "$entity_file")
 ## processed leases are removed from $leases, so only the obsolete leases remain in the end
 
 
