@@ -5,7 +5,7 @@
 {% for device in devices if device_name in device_attr(device, 'name') %}
     {% set data = namespace(entities=[]) %}
     {% set entities = device_entities(device) | list | sort %}
-    {% if entities %}
+    {#% if entities %#}
         {% for entity in entities %}
             {% set ip_address = state_attr(entity, 'ip_address') %}
             {% if ip_address %}
@@ -22,7 +22,7 @@
             {% endif %}
         {% endfor %}
         {% set ns.devices = ns.devices + [ {device: {'name': device_attr(device, 'name'), 'entities': data.entities}} ] %}
-    {% endif %}
+    {#% endif %#}
 {% endfor %}
 {{ ns.devices }}
 "}
