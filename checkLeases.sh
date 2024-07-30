@@ -108,7 +108,7 @@ echo "$leases" | jq -c '.' | while read -r lease; do
 done
 
 ## wait for asynchronous processes to be finished
-wait
+#wait
 echo "Finished pinging of inactive clients"
 
 ## remove the *.handled file

@@ -9,4 +9,4 @@ sleep 30
 # only the scripts below need to run twice a minute
 . "./checkAccessRestriction.sh" &
 . "./checkAdBlock.sh" &
-wait
+#wait

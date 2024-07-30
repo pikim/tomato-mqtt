@@ -22,4 +22,4 @@
 . "./checkAccessRestriction.sh" &
 . "./checkAdBlock.sh" &
 
-wait
+#wait
