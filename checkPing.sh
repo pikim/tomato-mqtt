@@ -12,8 +12,8 @@ ping_host(){
     ping_time=$(echo "$ping_result" | grep "round-trip" | cut -d " " -f 4 | cut -d "/" -f 1)
 
     host_name="${host_name//./_}"
-    mqtt_publish -e "ping $host_name loss" -s "$ping_loss" -o '"icon": "mdi:percent", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "%",'
-    mqtt_publish -e "ping $host_name time" -s "$ping_time" -o '"icon": "mdi:timer-outline", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "ms",'
+    mqtt_publish -g "ping" -n "$host_name loss" -s "$ping_loss" -o '"ic":"mdi:percent","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"%",'
+    mqtt_publish -g "ping" -n "$host_name time" -s "$ping_time" -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"ms",'
 }
 
 for i in $hosts; do

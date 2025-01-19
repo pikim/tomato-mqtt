@@ -6,12 +6,14 @@
 . "./common.sh"
 
 integration="binary_sensor"
+
+## remove the *.handled file
 rm -f "${file_prefix}.handled"
 sync
 
 
 ## get the device ID and all its entities with an ip_address
-leases=$(jq ". | select(.ip_address != null)" "$entity_file")
+leases=$(jq 'select(.ip_address != null)' "$entity_file")
 ## processed leases are removed from $leases, so only the obsolete leases remain in the end
 
 
@@ -23,23 +25,6 @@ process_active_clients(){
     client_name="$1"
     client_addr="$2"
 
-    ## fetch meta data by friendly name (including the device prefix) and remove the device prefix
-    meta=$(echo "$leases" | jq -r ". | select(.friendly_name == \"$client_name\")")
-    friendly=$(echo "$meta" | jq -r '.friendly_name')
-    address=$(echo "$meta" | jq -r '.ip_address')
-    entity=$(echo "$meta" | jq -r '.entity')
-
-    ## remember that this entity was already processed
-    echo "$entity" >> "${file_prefix}.handled"
-
-    ## delete entity if it has the same name but a different address
-    if [ "$friendly" = "$client_name" ]; then
-        if [ "$address" != "$client_addr" ]; then
-            echo "Deleting differing $client_name"
-            mqtt_publish -e "$client_name" -i "$integration" -d true
-        fi
-    fi
-
     ## ping client and parse data
     ping_result=$(ping -c 5 "$client_addr" | tail -2)
     ping_loss=$(echo "$ping_result" | tr ',' '\n' | grep "packet loss" | grep -o '[0-9]\+')
@@ -48,7 +33,26 @@ process_active_clients(){
     state="ON"
     [ "$ping_loss" = "100" ] && state="OFF"
     echo "Publishing $client_name ($client_addr): $state"
-    mqtt_publish -e "$client_name" -i "$integration" -s "$state" -a "{\"ip_address\": \"$client_addr\"}" -o '"device_class": "connectivity",'
+    mqtt_publish -g "leases" -n "$client_name" -f "$client_name" -i "$integration" -s "$state" -o '"dev_cla":"connectivity",'
+
+    ## fetch internal results from mqtt_publish
+    unique_id="$_unique_id"
+    cfg_topic="$_cfg_topic"
+
+    ## fetch meta data by unique_id name
+    meta=$(echo "$leases" | jq -r "select(.uid == \"$unique_id\")")
+    address=$(echo "$meta" | jq -r '.ip_address')
+    uid=$(echo "$meta" | jq -r '.uid')
+#    echo "$meta => $address => $uid"
+
+    ## remember that this uid was already processed
+    echo "$uid" >> "${file_prefix}.lease_uid"
+
+    ## update IP address if it has changed
+    if [ "$address" != "$client_addr" ]; then
+        echo "Updating IP of $client_name to $client_addr"
+        mqtt_publish -g "leases" -n "$client_name" -f "$client_name" -i "$integration" -a "\"ip_address\":\"$client_addr\",\"discovery\":\"$cfg_topic\"" -o '"dev_cla":"connectivity",'
+    fi
 }
 
 
@@ -57,7 +61,7 @@ process_active_clients(){
 ## $1: the name of the client as fetched from Home Assistant
 ## $2: the IP address of the client which has to be pinged
 process_inactive_clients(){
-    friendly="$1"
+    discovery="$1"
     address="$2"
 
     ## ping client and parse data
@@ -68,8 +72,8 @@ process_inactive_clients(){
     state="ON"
     [ "$ping_loss" = "100" ] && state="OFF"
     if [ "$state" = "OFF" ]; then
-        echo "Deleting inactive $friendly"
-        mqtt_publish -e "$friendly" -i "$integration" -d true
+        echo "Deleting inactive $discovery"
+        mqtt_publish -g "na" -n "na" -i "na" -c "$discovery" -d true
     fi
 }
 
@@ -90,26 +94,23 @@ wait
 echo "Finished pinging of active clients"
 
 
-## extract inactive leases received from Home Assistant (*.handled file)
-while IFS="" read -r entity || [ -n "$entity" ]
+## extract inactive leases received from Home Assistant (*.lease_uid file)
+while IFS="" read -r unique_id || [ -n "$unique_id" ]
 do
-    leases=$(echo "$leases" | jq -r ". | select(.entity != \"$entity\")")
-done < "${file_prefix}.handled"
+    leases=$(echo "$leases" | jq -r "select(.uid != \"$unique_id\")")
+done < "${file_prefix}.lease_uid"
 
 
 ## iterate over remaining inactive leases
 echo "Starting to ping inactive clients"
 echo "$leases" | jq -c '.' | while read -r lease; do
 #    echo "$lease"
-    friendly=$(echo "$lease" | jq -r '.friendly_name')
+    discovery=$(echo "$lease" | jq -r '.discovery')
     address=$(echo "$lease" | jq -r '.ip_address')
 
-    process_inactive_clients "$friendly" "$address" &
+    process_inactive_clients "$discovery" "$address" &
 done
 
 ## wait for asynchronous processes to be finished
 #wait
 echo "Finished pinging of inactive clients"
-
-## remove the *.handled file
-rm -f "${file_prefix}.handled"

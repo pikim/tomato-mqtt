@@ -5,21 +5,26 @@
 ## read custom configuration
 . "./config.sh"
 
-## MQTT topic settings
-retain=""
-#retain="-r"
+## define variables
 prefix="FreshTomato"
-device=$(nvram get t_fix1)
+discovery_topic="homeassistant"
+
+manu_model=$(nvram get t_model_name)
+manu=$(echo "$manu_model" | awk '{print $1}')
+model=$(echo "$manu_model" | awk '{print $2}')
+
 version=$(nvram get os_version)
 ip_addr=$(nvram get lan_ipaddr)
+hostname=$(nvram get lan_hostname)
+hw_addr=$(echo "$(nvram get lan_hwaddr)" | tr -d ':')
 
 ## set https or http as protocol
 [ "$(nvram get https_enable)" = "1" ] && cfg_url="https://$ip_addr"
 [ "$(nvram get http_enable)" = "1" ] && cfg_url="http://$ip_addr"
 
 ## file settings
-file_prefix="/tmp/${prefix}_${device}"
-entity_file="${file_prefix}.jsonl"
+file_prefix="/tmp/${prefix}_${model}"
+entity_file="${file_prefix}.entity"
 json_file="${file_prefix}.json"
 twig_file="${file_prefix}.twig"
 pid_file="${file_prefix}.pid"
@@ -40,7 +45,7 @@ fetch_entities(){
 
     ## update device_name in template.twig
     if [ ! -e "$twig_file" ]; then
-        sed "s/{% set device_name =.*/{% set device_name = '$device' %}/g" "template.twig" > "$twig_file"
+        sed "s/{% set device_name =.*/{% set device_name = '$hostname' %}/g" "template.twig" > "$twig_file"
     fi
 
     ## request entities
@@ -54,10 +59,8 @@ fetch_entities(){
     sed -i "s/'/\"/g" "$json_file"
 #    content=$(jq '.' "$json_file") && echo "$content" > "$json_file"
 
-    ## convert to jsonl with only the most relevant data without device name in friendly name
-    device_id=$(jq ".[] | keys[]" "$json_file")
-    jq -c ".[][$device_id].entities[]" "$json_file" > "$entity_file"
-    sed -i "s/friendly_name\":\"$device /friendly_name\":\"/g" "$entity_file"
+    ## extract the entity data from json file
+    jq '.[][].entities[]' "$json_file" > "$entity_file"
 
     ## critical part finished, unlock
     flock --unlock 221
@@ -67,91 +70,149 @@ fetch_entities(){
 fetch_entities
 
 
-## Publish an entity state
+## Publish device discovery, state and/or attributes
+## -n|--name: entity name as string
+##      e.g. 'CPU usage'. Spaces will be replaced with underscores
+## -g|--group: group of the entity
+##      e.g. 'CPU'
 ## -s|--state: entity value
 ##      e.g. '8'.
-## -d|--delete: true to delete an entity
-## -e|--entity: entity name as string
-##      e.g. 'CPU usage'. Spaces will be replaced with underscores
-## -f|--friendly: friendly name as string
-##      e.g. 'CPU usage'
 ## -o|--options: additional information for MQTT discovery, as comma terminated string (optional)
-##      e.g. '"icon": "mdi:numeric", "state_class": "measurement", "device_class": "temperature", "unit_of_meas": "°C", "entity_category": "diagnostic", '
+##      e.g. '"icon":"mdi:numeric","state_class":"measurement","device_class":"temperature","unit_of_meas":"°C","entity_category":"diagnostic",'
+## -f|--friendly: friendly name as string (optional)
+##      e.g. 'CPU usage'
 ## -a|--attributes: attributes for the entity (optional)
 ##      e.g. '"rule_name": "Block Server"'
 ## -i|--integration: integration type (optional, default is 'sensor')
 ##      e.g. "binary_sensor", "sensor" or "switch"
+## -c|--config_topic: custom MQTT configuration topic (optional)
+##      e.g. 'homeassistant/sensor/FreshTomato_R7000_AABBCCDDEEFF/clients_count/config'.
+## -d|--delete: true to delete an entity
 mqtt_publish(){
-    state=""
-    entity=""
-    options=""
-    friendly=""
-    attributes=""
-    integration="sensor"
-    delete=false
+    _name=""
+    _group=""
+    _state=""
+    _options=""
+    _friendly=""
+    _attributes=""
+    _integration="sensor"
+    _config_topic=""
+    _delete=false
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
     while [ "$#" -gt 0 ]; do
         case $1 in
-            -s|--state) state="$2" ## Store the first name argument
+            -n|--name) _name="$2" ## Store the first name argument
                 shift;;
-            -d|--delete) delete="$2" ## Store the first name argument
+            -g|--group) _group="$2" ## Store the first name argument
                 shift;;
-            -e|--entity) entity="$2" ## Store the first name argument
+            -s|--state) _state="$2" ## Store the first name argument
                 shift;;
-            -o|--options) options="$2" ## Store the first name argument
+            -o|--options) _options="$2" ## Store the first name argument
                 shift;;
-            -f|--friendly) friendly="$2" ## Store the first name argument
+            -f|--friendly) _friendly="$2" ## Store the first name argument
                 shift;;
-            -a|--attributes) attributes="$2" ## Store the first name argument
+            -a|--attributes) _attributes="$2" ## Store the first name argument
                 shift;;
-            -i|--integration) integration="$2" ## Store the first name argument
+            -i|--integration) _integration="$2" ## Store the first name argument
+                shift;;
+            -c|--config_topic) _config_topic="$2" ## Store the first name argument
+                shift;;
+            -d|--delete) _delete="$2" ## Store the first name argument
                 shift;;
             *) echo "Unknown parameter passed: $1" ## Display error for unknown parameter
         esac
         shift ## Move to the next argument
     done
 
-    if [ "$friendly" = "" ]; then
-        ## no friendly name given, use entity name
-        friendly="$entity"
-    fi
-    entity="${entity// /_}"
+    ## clean name and store it as entity
+    _entity=$(echo "$_name" | sed 's/[^A-Za-z0-9\._-]/_/g' | sed 's/[_]\{2,\}/_/g')
 
     ## define topics once and reuse them
-    cfg_topic="homeassistant/${integration}/${entity}/config"
-    attr_topic="homeassistant/${integration}/${entity}/attributes"
-    state_topic="homeassistant/${integration}/${entity}/state"
+    _cfg_topic="${discovery_topic}/${_integration}/${prefix}_${model}_${hw_addr}/${_group}_${_entity}/config"
+    _attr_topic="${prefix}/${model}_${hw_addr}/${_group}/${_entity}/attr"
+    _state_topic="${prefix}/${model}_${hw_addr}/${_group}/${_entity}"
 
-    if [ "$delete" = true ]; then
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$cfg_topic" -m ""
+    if [ -n "$_config_topic" ]; then
+        _cfg_topic="$_config_topic"
+    fi
+
+    if [ "$_delete" = true ]; then
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_cfg_topic" -m ""
         return
     fi
 
-    if ! grep -Fiqx "${integration}.${device}_${entity}" "$entity_file"; then
-        ## create variables
-        object_id="${device}_${entity}"
-        unique_id="${prefix}_${device}_${entity}"
+    if [ "$_friendly" = "" ]; then
+        ## no friendly name given, create one
+        _friendly="${_group} ${_name}"
+    fi
+
+    ## create variables and clean names
+    _object_id="${hostname}_${_group}_${_entity}"
+    _unique_id="${hw_addr}_${_group}_${_entity}"
+    _object_id=$(echo "$_object_id" | sed 's/[^A-Za-z0-9\_]/_/g' | sed 's/[_]\{2,\}/_/g')
+    _unique_id=$(echo "$_unique_id" | sed 's/[^A-Za-z0-9\_]/_/g' | sed 's/[_]\{2,\}/_/g')
+    _send_attr=false
+
+    if ! grep -Fiq "$_unique_id" "$entity_file"; then
+        ## prepare data to be sent
+        _json_data=\
+"{\
+\"name\":\"${_friendly}\",\
+\"stat_t\":\"${_state_topic}\",\
+\"json_attr_t\":\"${_attr_topic}\",\
+\"uniq_id\":\"${_unique_id}\",\
+\"obj_id\":\"${_object_id}\",\
+${_options}\
+\"dev\":\
+{\
+\"name\":\"${hostname}\",\
+\"ids\":[\"${manu_model} ${hw_addr}\"],\
+\"mf\":\"${manu}\",\
+\"mdl\":\"${model}\",\
+\"cu\":\"${cfg_url}\",\
+\"sw\":\"${version}\"\
+}\
+}"
 
         ## string not found in file, entity wasn't registered yet
         ## announce entity
-#        echo "$cfg_topic"
-#        echo "{\"name\": \"${friendly}\", \"state_topic\": \"${state_topic}\", \"json_attributes_topic\": \"${attr_topic}\", ${options} \"object_id\": \"${object_id}\", \"unique_id\": \"${unique_id}\", \"device\": {\"identifiers\": [\"${prefix} ${device}\"], \"name\": \"${device}\", \"configuration_url\": \"${cfg_url}\", \"sw_version\": \"${version}\"}}"
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$cfg_topic" -m "{\"name\": \"${friendly}\", \"state_topic\": \"${state_topic}\", \"json_attributes_topic\": \"${attr_topic}\", ${options} \"object_id\": \"${object_id}\", \"unique_id\": \"${unique_id}\", \"device\": {\"identifiers\": [\"${prefix} ${device}\"], \"name\": \"${device}\", \"configuration_url\": \"${cfg_url}\", \"sw_version\": \"${version}\"}}"
+#        echo "$_cfg_topic => $_json_data"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_cfg_topic" -m "$_json_data"
+
+        if [ -z "$_attributes" ]; then
+            ## force attribute update
+            _send_attr=true
+        fi
+
+        ## after the discovery topic it takes some time until attr and state will show up
+        usleep 400000
     fi
 
-    if [ -n "$state" ]; then
+    if [ -n "$_state" ]; then
         ## send entity state via MQTT
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$state_topic" -m "$state"
+#        echo "$_state_topic => $_state"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_state_topic" -m "$_state"
 
         ## send entity data via REST, UNTESTED!!!
-#        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}"
+#        curl -X POST -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" -d "{\"state\":\"$state\"}" "http://${ra_addr}:${ra_port}/api/states/${integration}.${model}_${entity}"
     fi
 
-    if [ -n "$attributes" ]; then
+    if [ -n "$_attributes" ]; then
+        ## eventually append a comma
+        _attributes="${_attributes},"
+        ## force attribute update
+        _send_attr=true
+    fi
+
+    if [ "$_send_attr" = true ]; then
+        ## append unique_id to attributes
+        _attributes=$(echo "{${_attributes}\"uid\":\"$_unique_id\"}")
+
         ## send entity attributes via MQTT
-        mosquitto_pub $retain -h "$addr" -p "$port" -u "$username" -P "$password" -t "$attr_topic" -m "$attributes"
+#        echo "$_attr_topic => $_attributes"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_attr_topic" -m "$_attributes"
     fi
 }
 
@@ -172,30 +233,30 @@ mqtt_publish(){
 ## -i|--integration: integration type (optional, default is 'sensor')
 ##      e.g. "binary_sensor", "sensor", "switch", ...
 rest_get(){
-    entity=""
-    property=""
-    integration="sensor"
+    _entity=""
+    _property=""
+    _integration="sensor"
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
     while [ "$#" -gt 0 ]; do
         case $1 in
-            -e|--entity) entity="$2" ## Store the first name argument
+            -e|--entity) _entity="$2" ## Store the first name argument
                 shift;;
-            -p|--property) property="$2" ## Store the first name argument
+            -p|--property) _property="$2" ## Store the first name argument
                 shift;;
-            -i|--integration) integration="$2" ## Store the first name argument
+            -i|--integration) _integration="$2" ## Store the first name argument
                 shift;;
             *) echo "Unknown parameter passed: $1" ## Display error for unknown parameter
         esac
         shift ## Move to the next argument
     done
 
-    entity="${entity// /_}"
+    _entity="${_entity// /_}"
 
 #    echo "Authorization: Bearer $ra_token"
-#    echo "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}"
-    curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_addr}:${ra_port}/api/states/${integration}.${device}_${entity}" | jq -r ".${property}"
+#    echo "http://${ra_addr}:${ra_port}/api/states/${_integration}.${model}_${_entity}"
+    curl -X GET -s -H "Authorization: Bearer $ra_token" -H "Content-Type: application/json" "http://${ra_addr}:${ra_port}/api/states/${_integration}.${model}_${_entity}" | jq -r ".${_property}"
 }
 
 ## curl get response:

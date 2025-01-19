@@ -12,7 +12,7 @@ Developped on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https:
 - the router pushes and pulls data - without exposing any interface on router side
 - allows to enable/disable access restriction rules from within Home Assistant
 - allows to enable/disable the adblocker from within Home Assistant
-- allows to track the connection state of clients
+- allows to track the connection state and IP of clients
 
 
 ## Requirements
@@ -72,7 +72,7 @@ Enjoy having the data on your MQTT server!
 
 ## Implementation details
 
-The scripts collect the relevant data on the router itself. When data preparation has finished the data is transferred via MQTT. The function `fetch_entities` in `common.sh` will request the state of all device entities from Home Assistant. This happens by using a template sensor which defined in `template.twig`. Home Assistant will reply with a json structure that contains the entity names and friendly names of all dedicated entities. The json also will contain the IP addresses of the address leases and the state of the access rule and adblock switches. The file can be found in `/tmp` until the router is rebooted.
+The scripts collect the relevant data on the router itself. When data preparation has finished the data is transferred via MQTT. The function `fetch_entities` in `common.sh` will request the state of all device entities from Home Assistant. This happens by using a template sensor defined in `template.twig`. Home Assistant will reply with a json structure that contains the relevant data of all dedicated entities. E.g. the json will contain the IP addresses of the address leases and the state of the access rule and adblock switches. The file can be found in `/tmp` until the router is rebooted.
 
 `checkAccessRestriction.sh` and `checkAdBlock.sh` use the state data to control the corresponding rules/service. If the desired state (on Home Assistant) differs from the current state (on router) the according rule or service is updated and applied.
 
@@ -101,13 +101,4 @@ echo "$cpuTemp"
 
 ## Deletion
 
-`removeEntities.sh` can delete all topics within the file, e.g.
-```
-sh /opt/tomato-mqtt/removeEntities.sh FreshTomato_R7000.txt
-```
-It also allows to delete only a single topic, e.g.
-```
-sh /opt/tomato-mqtt/removeEntities.sh homeassistant/sensor/CPU_temperature/config
-```
-
-Note: the file `FreshTomato_R7000.txt` is not used any more.
+To remove a created device and all its entities, use the delete button on the according device page in Home Assistant.

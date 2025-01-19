@@ -19,7 +19,7 @@ up=$(echo "$result" | awk -F\" '{print $14}')
 down=$((down/125))
 up=$((up/125))
 
-mqtt_publish -e "speedtest ping" -s "$ping" -o '"icon": "mdi:timer-outline", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "ms",'
-mqtt_publish -e "speedtest upload" -s "$up" -o '"icon": "mdi:speedometer", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "kbit/s",'
-mqtt_publish -e "speedtest download" -s "$down" -o '"icon": "mdi:speedometer", "state_class": "measurement", "entity_category": "diagnostic", "unit_of_meas": "kbit/s",'
-#mqtt_publish -e "speedtest URL" -i "text" -s "$url" -o '"icon": "mdi:web", "entity_category": "diagnostic",'
+mqtt_publish -g "speedtest" -n "ping" -s "$ping" -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"ms",'
+mqtt_publish -g "speedtest" -n "upload" -s "$up" -o '"ic":"mdi:speedometer","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"kbit/s",'
+mqtt_publish -g "speedtest" -n "download" -s "$down" -o '"ic":"mdi:speedometer","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"kbit/s",'
+#mqtt_publish -g "speedtest" -n "URL" -i "text" -s "$url" -o '"ic":"mdi:web","ent_cat":"diagnostic",'

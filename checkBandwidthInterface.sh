@@ -7,11 +7,11 @@
 . "./common.sh"
 
 ignore="dpsta ifb0 ifb1 ifb2 ifb3"
+echo "Ignoring interfaces: $ignore"
 
 for i in $(ls -A /sys/class/net/); do
     ## skip interfaces from ignore list
     if echo "$ignore" | grep -q "$i" 2>/dev/null; then
-        echo "Ignoring interface $i"
         continue
     fi
 
@@ -21,6 +21,6 @@ for i in $(ls -A /sys/class/net/); do
     tx=$(cat "/sys/class/net/${i}/statistics/tx_bytes")
 
     i="${i//./_}"
-    mqtt_publish -e "network $i receive" -s "$rx" -o '"icon": "mdi:server-network", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B",'
-    mqtt_publish -e "network $i transmit" -s "$tx" -o '"icon": "mdi:server-network", "state_class": "measurement", "entity_category": "diagnostic", "device_class": "data_size", "unit_of_meas": "B",'
+    mqtt_publish -g "network" -n "$i receive" -s "$rx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
+    mqtt_publish -g "network" -n "$i transmit" -s "$tx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
 done

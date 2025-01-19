@@ -8,6 +8,7 @@
 . "./common.sh"
 
 changed=false
+group="access"
 integration="switch"
 
 
@@ -30,29 +31,28 @@ while IFS= read -r rrule; do
     ## skip dummy rrule0
     [ "$name" = "rrule0" ] && continue
 
-    ## get the desired friendly name and state from json
-    meta=$(jq ". | select(.friendly_name == \"$desc\")" "$entity_file")
-    friendly=$(echo "$meta" | jq -r '.friendly_name')
-    state=$(echo "$meta" | jq -r '.state')
-
-    ## delete rrule if it's empty (no | in string)
+    ## delete topic if rule empty (no | in string)
     if ! echo "$rrule" | grep -q "|" 2>/dev/null; then
         echo "Deleting empty rule $name"
-        mqtt_publish -e "$name" -i "$integration" -d true
+        mqtt_publish -g "$group" -n "$name" -i "$integration" -d true
         nvram unset "$name"
         continue
     fi
 
-#    echo "'$desc' '$friendly'"
-#    echo "$meta"
+    ## get the desired friendly name and state from json
+    meta=$(jq -r "select(.uid | endswith(\"_access_${name}\"))" "$entity_file")
+    friendly=$(echo "$meta" | jq -r '.rule_name')
+    state=$(echo "$meta" | jq -r '.state')
 
-    ## delete topic if friendly name has changed
-    if [ "$desc" != "$friendly" ]; then
+#    echo "$meta"
+#    echo "'$desc' '$friendly' $state"
+
+    ## delete topic if friendly name exists and has changed
+    if [[ -n "$friendly" && "$friendly" != "$desc" ]]; then
         echo "Renaming rule '$friendly' to '$desc'"
-        mqtt_publish -e "$name" -i "$integration" -d true
-        friendly="$desc"
+        mqtt_publish -g "$group" -n "$name" -i "$integration" -d true
+        fetch_entities ## update entity list
     fi
-#    echo "$name \"$friendly\""
 
     enable_new=null
     ## convert state
@@ -67,11 +67,11 @@ while IFS= read -r rrule; do
 #    echo "$enable_old $enable_new"
 
     ## publish entity
-    mqtt_publish -e "$name" -f "$friendly" -i "$integration" -s "$enable_new" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:network-off-outline\","
+    mqtt_publish -g "$group" -n "$name" -f "$desc" -i "$integration" -s "$enable_new" -a "\"rule_name\":\"$desc\"" -o "\"cmd_t\":\"${prefix}/${model}_${hw_addr}/${group}/${name}\",\"pl_off\":\"0\",\"pl_on\":\"1\",\"ic\":\"mdi:network-off-outline\","
 
     ## skip following steps if nothing has changed
     if [ "$enable_old" = "$enable_new" ]; then
-        echo "State of $name didn't change"
+        echo "$name state unchanged"
         continue
     fi
 
@@ -82,7 +82,7 @@ while IFS= read -r rrule; do
     nvram set "$rrule"
 
     ## notify and remember that something has changed
-    echo "State of $name has changed"
+    echo "$name state changed: $enable_old => $enable_new"
     changed=true
 done <<EOF
 $rrules
@@ -90,7 +90,7 @@ EOF
 
 ## leave if nothing has changed
 if [ "$changed" = false ]; then
-    echo "Nothing has changed"
+    echo "Nothing to do"
     return 0
 fi
 echo "Updating access restrictions"

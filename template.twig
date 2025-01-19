@@ -1,28 +1,23 @@
-{"template": "
+{"template":"
 {% set device_name = '' %}
 {% set devices = states | map(attribute='entity_id') | map('device_id') | unique | reject('eq',None) | list %}
-{% set ns = namespace(devices = []) %}
-{% for device in devices if device_attr(device, 'name') is not none and device_name in device_attr(device, 'name') %}
-    {% set data = namespace(entities=[]) %}
-    {% set entities = device_entities(device) | list | sort %}
-    {#% if entities %#}
-        {% for entity in entities %}
-            {% set ip_address = state_attr(entity, 'ip_address') %}
-            {% if ip_address %}
-                {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name'), 'ip_address': ip_address} %}
-            {% elif 'switch.' in entity %}
-                {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name'), 'state': states(entity)} %}
-{#
-            {% else %}
-                {% set entity_meta = {'entity': entity, 'friendly_name': state_attr(entity, 'friendly_name')} %}
-#}
-            {% endif %}
-            {% if entity_meta | default(false) %}
-                {% set data.entities = data.entities + [entity_meta] %}
-            {% endif %}
-        {% endfor %}
-        {% set ns.devices = ns.devices + [ {device: {'name': device_attr(device, 'name'), 'entities': data.entities}} ] %}
-    {#% endif %#}
+{% set ns = namespace(devices=[]) %}
+{% for device in devices if device_attr(device,'name') is not none and device_attr(device,'name') in device_name %}
+  {% set data = namespace(entities=[]) %}
+  {% for entity in device_entities(device) | list %}
+    {% set meta = {'uid':state_attr(entity,'uid')} %}
+    {% if state_attr(entity,'ip_address') %}
+      {% set meta = dict(meta, **{'ip_address':state_attr(entity,'ip_address')}) %}
+    {% endif %}
+    {% if state_attr(entity,'rule_name') %}
+      {% set meta = dict(meta, **{'rule_name':state_attr(entity,'rule_name')}) %}
+    {% endif %}
+    {% if 'switch.' in entity %}
+      {% set meta = dict(meta, **{'state': states(entity)}) %}
+    {% endif %}
+    {% set data.entities = data.entities + [meta] %}
+  {% endfor %}
+  {% set ns.devices = ns.devices + [{device:{'name':device_attr(device,'name'),'entities':data.entities}}] %}
 {% endfor %}
 {{ ns.devices }}
 "}

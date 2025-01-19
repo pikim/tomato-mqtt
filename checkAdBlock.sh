@@ -7,7 +7,7 @@
 
 . "./common.sh"
 
-name="AdBlock"
+group="AdBlock"
 integration="switch"
 
 
@@ -19,8 +19,7 @@ else
 fi
 
 ## get the desired state
-meta=$(jq ". | select(.friendly_name == \"$name\")" "$entity_file")
-state=$(echo "$meta" | jq -r '.state')
+state=$(jq -r "select(.uid | endswith(\"${group}_state\")) | .state" "$entity_file")
 
 enable_new=null
 ## convert state
@@ -32,21 +31,31 @@ case $state in
     *) echo "Unknown parameter passed: \"$state\". Using current state: \"$enable_old\"."
         enable_new="$enable_old" ;;
 esac
-echo "AdBlock states: router=${enable_old}; hass=${enable_new}"
+#echo "AdBlock states: router=${enable_old}; hass=${enable_new}"
 
-## publish entity
-mqtt_publish -e "$name" -i "$integration" -s "$enable_new" -o "\"command_topic\": \"homeassistant/${integration}/${name// /_}/state\", \"payload_off\": \"0\", \"payload_on\": \"1\", \"icon\": \"mdi:advertisements-off\","
+## publish switch entity
+mqtt_publish -g "$group" -n "state" -f "$group" -i "$integration" -s "$enable_new" -o "\"cmd_t\":\"${prefix}/${model}_${hw_addr}/${group}/state\",\"pl_off\":\"0\",\"pl_on\":\"1\",\"ic\":\"mdi:advertisements-off\","
 
+error=false
 ## leave if nothing has changed
 if [ "$enable_old" = "$enable_new" ]; then
-    echo "AdBlock state didn't change"
-    return 0
+    echo "AdBlock state unchanged"
+else
+    echo "AdBlock state changed: $enable_old => $enable_new"
+
+    if [ "$enable_new" = 1 ]; then
+        echo "Starting AdBlock"
+        output=$(adblock start)
+        echo "$output"
+
+        if echo "$output" | grep -q "Adblock/DNS-filtering is disabled! Exiting..."; then
+            error=true
+        fi
+    else
+        echo "Stopping AdBlock"
+        adblock stop
+    fi
 fi
 
-if [ "$enable_new" = 1 ]; then
-    echo "Starting AdBlock"
-    adblock start
-else
-    echo "Stopping AdBlock"
-    adblock stop
-fi
+## publish error state
+mqtt_publish -g "$group" -n "error" -s "$error" -o '"ic":"mdi:exclamation-thick","ent_cat":"diagnostic",'

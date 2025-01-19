@@ -6,4 +6,4 @@
 
 clients=$(arp -an | grep -cv vlan2)
 
-mqtt_publish -e "clients count" -s "$clients" -o '"icon": "mdi:numeric", "state_class": "measurement", "entity_category": "diagnostic",'
+mqtt_publish -g "clients" -n "count" -s "$clients" -o '"ic":"mdi:numeric","stat_cla":"measurement","ent_cat":"diagnostic",'
