@@ -5,6 +5,7 @@
 
 . "./common.sh"
 
+leases_file="/var/lib/misc/dnsmasq.leases"
 integration="binary_sensor"
 
 ## remove the *.handled file
@@ -78,6 +79,11 @@ process_inactive_clients(){
 }
 
 
+## get and transmit the number of leases first
+count=$(wc -l "$leases_file" | awk '{print $1}')
+mqtt_publish -g "leases" -n "count" -s "$count" -o '"ic":"mdi:numeric","stat_cla":"measurement","ent_cat":"diagnostic",'
+
+
 ## iterate over active leases from dnsmasq file
 echo "Starting to ping active clients"
 while IFS="" read -r p || [ -n "$p" ]
@@ -87,7 +93,7 @@ do
     client_name=$(echo "$p" | awk '{print $4}')
 
     process_active_clients "$client_name" "$client_addr" &
-done < "/var/lib/misc/dnsmasq.leases"
+done < "$leases_file"
 
 ## wait for asynchronous processes to be finished
 wait
