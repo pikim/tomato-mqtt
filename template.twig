@@ -15,7 +15,9 @@
     {% if 'switch.' in entity %}
       {% set meta = dict(meta, **{'state': states(entity)}) %}
     {% endif %}
-    {% set data.entities = data.entities + [meta] %}
+    {% if meta.uid %}
+      {% set data.entities = data.entities + [meta] %}
+    {% endif %}
   {% endfor %}
   {% set ns.devices = ns.devices + [{device:{'name':device_attr(device,'name'),'entities':data.entities}}] %}
 {% endfor %}
