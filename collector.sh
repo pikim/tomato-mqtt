@@ -7,19 +7,19 @@
 # results. If this is intended anyhow, it's highly recommended to source variables.sh
 # first by uncommenting the following line.
 
-. "./common.sh"
+. './common.sh'
 
-. "./checkCPU.sh"
-. "./checkMem.sh" &
-. "./checkDisk.sh" &
-. "./checkLoad.sh" &
-. "./checkPing.sh" &
-. "./checkLeases.sh" &
-. "./checkClients.sh" &
-. "./checkWireless.sh" &
-. "./checkConnections.sh" &
-. "./checkBandwidthInterface.sh" &
-. "./checkAccessRestriction.sh" &
-. "./checkAdBlock.sh" &
+. './checkCPU.sh'
+. './checkMem.sh' &
+. './checkDisk.sh' &
+. './checkLoad.sh' &
+. './checkPing.sh' &
+. './checkLeases.sh' &
+. './checkClients.sh' &
+. './checkWireless.sh' &
+. './checkConnections.sh' &
+. './checkBandwidthInterface.sh' &
+. './checkAccessRestriction.sh' &
+. './checkAdBlock.sh' &
 
 #wait

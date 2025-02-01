@@ -10,7 +10,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 ## Change into that directory
 cd "$SCRIPTPATH" || return
 
-sh "./speedTest.sh"
+sh './speedTest.sh'
 
 ## Change into initial directory
 cd - || return

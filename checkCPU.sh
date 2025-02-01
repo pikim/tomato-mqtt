@@ -3,11 +3,11 @@
 # Checks the CPU temperature and CPU usage in percent. Should not be executed in parallel
 # with the other script as its result will be distorted otherwise.
 
-. "./common.sh"
+. './common.sh'
 
 cpuTemp=$(grep -o '[0-9]\+' /proc/dmu/temperature)
 
-mqtt_publish -g "CPU" -n "temperature" -s "$cpuTemp" -o '"ic":"mdi:thermometer","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"temperature","unit_of_meas":"°C",'
+mqtt_publish -g 'CPU' -n 'temperature' -s "$cpuTemp" -o '"ic":"mdi:thermometer","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"temperature","unit_of_meas":"°C",'
 
 cpu=$(head -n1 /proc/stat | sed 's/cpu //')
 user=$(echo "$cpu" | awk '{print $1}')
@@ -48,15 +48,15 @@ diff_idle=$(( idle - idle_old ))
 usage=$((((1000*(diff_total-diff_idle))/diff_total+5)/10))
 #echo $usage $diff_total $diff_idle
 
-mqtt_publish -g "CPU" -n "usage" -s "$usage" -o '"ic":"mdi:percent","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"%",'
+mqtt_publish -g 'CPU' -n 'usage' -s "$usage" -o '"ic":"mdi:percent","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"%",'
 
-#mqtt_publish -g "CPU" -n "IRQ" -s $irq -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "user" -s $user -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "nice" -s $nice -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "idle" -s $idle -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "guest" -s $guest -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "steal" -s $steal -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "iowait" -s $iowait -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "system" -s $system -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "softirq" -s $softirq -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
-#mqtt_publish -g "CPU" -n "guest nice" -s $guest_nice -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'IRQ' -s $irq -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'user' -s $user -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'nice' -s $nice -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'idle' -s $idle -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'guest' -s $guest -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'steal' -s $steal -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'iowait' -s $iowait -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'system' -s $system -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'softirq' -s $softirq -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'
+#mqtt_publish -g 'CPU'' -n 'guest nice' -s $guest_nice -o '"ic":"mdi:timer-outline","stat_cla":"measurement","ent_cat":"diagnostic",'

@@ -3,4 +3,4 @@
 # Runs collector script immediately.
 
 
-sh "./collector.sh"
+sh './collector.sh'

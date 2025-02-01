@@ -3,11 +3,11 @@
 # Holds the base functionality and variables for all the other scripts.
 
 ## read custom configuration
-. "./config.sh"
+. './config.sh'
 
 ## define variables
-prefix="FreshTomato"
-discovery_topic="homeassistant"
+prefix='FreshTomato'
+discovery_topic='homeassistant'
 
 manu_model=$(nvram get t_model_name)
 manu=$(echo "$manu_model" | awk '{print $1}')
@@ -37,7 +37,7 @@ sourced_variables_sh=true
 
 ## Fetch device entities from Home Assistant
 fetch_entities(){
-    echo "Fetching device entities from Home Assistant"
+    echo 'Fetching device entities from Home Assistant'
     ## locking taken from https://gist.github.com/didenko/a92beec14ce2ca1c98f3
     exec 221>"${pid_file}"
     flock --exclusive 221
@@ -89,14 +89,14 @@ fetch_entities
 ##      e.g. 'homeassistant/sensor/FreshTomato_R7000_AABBCCDDEEFF/clients_count/config'.
 ## -d|--delete: true to delete an entity
 mqtt_publish(){
-    _name=""
-    _group=""
-    _state=""
-    _options=""
-    _friendly=""
-    _attributes=""
-    _integration="sensor"
-    _config_topic=""
+    _name=''
+    _group=''
+    _state=''
+    _options=''
+    _friendly=''
+    _attributes=''
+    _integration='sensor'
+    _config_topic=''
     _delete=false
 
     ## Loop through the provided arguments
@@ -233,9 +233,9 @@ ${_options}\
 ## -i|--integration: integration type (optional, default is 'sensor')
 ##      e.g. "binary_sensor", "sensor", "switch", ...
 rest_get(){
-    _entity=""
-    _property=""
-    _integration="sensor"
+    _entity=''
+    _property=''
+    _integration='sensor'
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/

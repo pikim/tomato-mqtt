@@ -10,10 +10,10 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 ## Change into that directory
 cd "$SCRIPTPATH" || return
 
-sh "./collector0.sh" &
-#sh "./collector20.sh" &
-sh "./collector30.sh" &
-#sh "./collector40.sh" &
+sh './collector0.sh' &
+#sh './collector20.sh' &
+sh './collector30.sh' &
+#sh './collector40.sh' &
 
 ## Change into initial directory
 cd - || return

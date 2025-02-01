@@ -5,11 +5,11 @@
 # On subsequent execution it checks the state of the switches and enables or disables
 # each rule accordingly.
 
-. "./common.sh"
+. './common.sh'
 
 changed=false
-group="access"
-integration="switch"
+group='access'
+integration='switch'
 
 
 ## get all the rules
@@ -29,7 +29,7 @@ while IFS= read -r rrule; do
 #    echo "$name  $desc  $enable_old"
 
     ## skip dummy rrule0
-    [ "$name" = "rrule0" ] && continue
+    [ "$name" = 'rrule0' ] && continue
 
     ## delete topic if rule empty (no | in string)
     if ! echo "$rrule" | grep -q "|" 2>/dev/null; then
@@ -57,10 +57,10 @@ while IFS= read -r rrule; do
     enable_new=null
     ## convert state
     case $state in
-        "1") enable_new="1" ;;
-        "0") enable_new="0" ;;
-        "on") enable_new="1" ;;
-        "off") enable_new="0" ;;
+        '1') enable_new='1' ;;
+        '0') enable_new='0' ;;
+        'on') enable_new='1' ;;
+        'off') enable_new='0' ;;
         *) echo "Unknown parameter passed: \"$state\". Using current state: \"$enable_old\"."
             enable_new="$enable_old" ;;
     esac
@@ -90,10 +90,10 @@ EOF
 
 ## leave if nothing has changed
 if [ "$changed" = false ]; then
-    echo "Nothing to do"
+    echo 'Nothing to do'
     return 0
 fi
-echo "Updating access restrictions"
+echo 'Updating access restrictions'
 
 ## wait if any service is currently being restarted
 nvstat=$(nvram get action_service)
@@ -108,6 +108,6 @@ nvram set action_service=restrict-restart
 kill -USR1 1
 
 ## wait for the service to restart
-while [ "$(nvram get action_service)" = "restrict-restart" ]; do
+while [ "$(nvram get action_service)" = 'restrict-restart' ]; do
     echo -n
 done

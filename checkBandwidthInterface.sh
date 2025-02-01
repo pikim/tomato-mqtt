@@ -4,9 +4,9 @@
 # `/sys/class/net` which were added to the variable `ignore` (space separated) below.
 # `listInterfaces.sh` shows a list of the interfaces.
 
-. "./common.sh"
+. './common.sh'
 
-ignore="dpsta ifb0 ifb1 ifb2 ifb3"
+ignore='dpsta ifb0 ifb1 ifb2 ifb3'
 echo "Ignoring interfaces: $ignore"
 
 for i in $(ls -A /sys/class/net/); do
@@ -21,6 +21,6 @@ for i in $(ls -A /sys/class/net/); do
     tx=$(cat "/sys/class/net/${i}/statistics/tx_bytes")
 
     i="${i//./_}"
-    mqtt_publish -g "network" -n "$i receive" -s "$rx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
-    mqtt_publish -g "network" -n "$i transmit" -s "$tx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
+    mqtt_publish -g 'network' -n "$i receive" -s "$rx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
+    mqtt_publish -g 'network' -n "$i transmit" -s "$tx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
 done
