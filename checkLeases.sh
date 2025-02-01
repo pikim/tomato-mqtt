@@ -64,6 +64,7 @@ process_active_clients(){
 process_inactive_clients(){
     discovery="$1"
     address="$2"
+    uid="$3"
 
     ## ping client and parse data
     ping_result=$(ping -c3 -w1 "$address" | tail -2)
@@ -73,8 +74,12 @@ process_inactive_clients(){
     state='ON'
     [ "$ping_loss" = '100' ] && state='OFF'
     if [ "$state" = 'OFF' ]; then
-        echo "Deleting inactive $discovery"
-        mqtt_publish -g 'na' -n 'na' -i 'na' -c "$discovery" -d true
+        if [ -n "$discovery" ]; then
+            echo "Deleting inactive $discovery"
+            mqtt_publish -g 'na' -n 'na' -i 'na' -c "$discovery" -d true
+        else
+            echo "Can't delete $uid. Topic name is missing."
+        fi
     fi
 }
 
@@ -113,8 +118,9 @@ echo "$leases" | jq -c '.' | while read -r lease; do
 #    echo "$lease"
     discovery=$(echo "$lease" | jq -r '.discovery')
     address=$(echo "$lease" | jq -r '.ip_address')
+    uid=$(echo "$lease" | jq -r '.uid')
 
-    process_inactive_clients "$discovery" "$address" &
+    process_inactive_clients "$discovery" "$address" "$uid" &
 done
 
 ## wait for asynchronous processes to be finished
