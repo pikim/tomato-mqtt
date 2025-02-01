@@ -27,7 +27,7 @@ process_active_clients(){
     client_addr="$2"
 
     ## ping client and parse data
-    ping_result=$(ping -c 5 "$client_addr" | tail -2)
+    ping_result=$(ping -c3 -w1 "$client_addr" | tail -2)
     ping_loss=$(echo "$ping_result" | tr ',' '\n' | grep 'packet loss' | grep -o '[0-9]\+')
 
     ## prepare and publish state
@@ -66,7 +66,7 @@ process_inactive_clients(){
     address="$2"
 
     ## ping client and parse data
-    ping_result=$(ping -c 5 "$address" | tail -2)
+    ping_result=$(ping -c3 -w1 "$address" | tail -2)
     ping_loss=$(echo "$ping_result" | tr ',' '\n' | grep 'packet loss' | grep -o '[0-9]\+')
 
     ## prepare state and eventually delete the entity
