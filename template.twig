@@ -6,18 +6,14 @@
   {% set data = namespace(entities=[]) %}
   {% for entity in device_entities(device) | list %}
     {% set meta = {'uid':state_attr(entity,'uid')} %}
-    {% if state_attr(entity,'ip_address') %}
-      {% set meta = dict(meta, **{'ip_address':state_attr(entity,'ip_address')}) %}
-    {% endif %}
-    {% if state_attr(entity,'rule_name') %}
-      {% set meta = dict(meta, **{'rule_name':state_attr(entity,'rule_name')}) %}
-    {% endif %}
-    {% if 'switch.' in entity %}
-      {% set meta = dict(meta, **{'state': states(entity)}) %}
-    {% endif %}
-    {% if meta.uid %}
-      {% set data.entities = data.entities + [meta] %}
-    {% endif %}
+    {% set ip = state_attr(entity,'ip_address') %}
+    {% set rule = state_attr(entity,'rule_name') %}
+    {% set topic = state_attr(entity,'discovery') %}
+    {% if ip %} {% set meta = dict(meta, **{'ip_address':ip}) %} {% endif %}
+    {% if rule %} {% set meta = dict(meta, **{'rule_name':rule}) %} {% endif %}
+    {% if topic %} {% set meta = dict(meta, **{'discovery':topic}) %} {% endif %}
+    {% if 'switch.' in entity %} {% set meta = dict(meta, **{'state':states(entity)}) %} {% endif %}
+    {% if meta.uid %} {% set data.entities = data.entities + [meta] %} {% endif %}
   {% endfor %}
   {% set ns.devices = ns.devices + [{device:{'name':device_attr(device,'name'),'entities':data.entities}}] %}
 {% endfor %}
