@@ -88,6 +88,7 @@ fetch_entities
 ## -c|--config_topic: custom MQTT configuration topic (optional)
 ##      e.g. 'homeassistant/sensor/FreshTomato_R7000_AABBCCDDEEFF/clients_count/config'.
 ## -d|--delete: true to delete an entity
+## -u|--unique: true to add unique_id
 mqtt_publish(){
     _name=''
     _group=''
@@ -98,6 +99,7 @@ mqtt_publish(){
     _integration='sensor'
     _config_topic=''
     _delete=false
+    _unique=false
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
@@ -120,6 +122,8 @@ mqtt_publish(){
             -c|--config_topic) _config_topic="$2" ## Store the first name argument
                 shift;;
             -d|--delete) _delete="$2" ## Store the first name argument
+                shift;;
+            -u|--unique) _unique="$2" ## Store the first name argument
                 shift;;
             *) echo "Unknown parameter passed: $1" ## Display error for unknown parameter
         esac
@@ -155,20 +159,24 @@ mqtt_publish(){
 
     ## create variables and clean names
     _object_id="${hostname}_${_group}_${_entity}"
-    _unique_id="${hw_addr}_${_group}_${_entity}"
     _object_id=$(echo "$_object_id" | sed 's/[^A-Za-z0-9\_]/_/g' | sed 's/[_]\{2,\}/_/g')
-    _unique_id=$(echo "$_unique_id" | sed 's/[^A-Za-z0-9\_]/_/g' | sed 's/[_]\{2,\}/_/g')
-    _send_attr=false
+
+    _unique_str=''
+    if [ -n "$_unique" ]; then
+        _unique_id="${hw_addr}_${_group}_${_entity}"
+        _unique_id=$(echo "$_unique_id" | sed 's/[^A-Za-z0-9\_]/_/g' | sed 's/[_]\{2,\}/_/g')
+        _unique_str="\"uniq_id\":\"${_unique_id}\","
+    fi
 
     if ! grep -Fiq "$_unique_id" "$entity_file"; then
         ## prepare data to be sent
         _json_data=\
 "{\
 \"name\":\"${_friendly}\",\
+\"obj_id\":\"${_object_id}\",\
+${_unique_str}\
 \"stat_t\":\"${_state_topic}\",\
 \"json_attr_t\":\"${_attr_topic}\",\
-\"uniq_id\":\"${_unique_id}\",\
-\"obj_id\":\"${_object_id}\",\
 ${_options}\
 \"dev\":\
 {\
@@ -186,11 +194,6 @@ ${_options}\
 #        echo "$_cfg_topic => $_json_data"
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_cfg_topic" -m "$_json_data"
 
-        if [ -z "$_attributes" ]; then
-            ## force attribute update
-            _send_attr=true
-        fi
-
         ## after the discovery topic it takes some time until attr and state will show up
         usleep 400000
     fi
@@ -205,19 +208,22 @@ ${_options}\
     fi
 
     if [ -n "$_attributes" ]; then
-        ## eventually append a comma
-        _attributes="${_attributes},"
-        ## force attribute update
-        _send_attr=true
+        ## remove trailing comma
+        _attributes="${_attributes%,}"
+
+        if [ "$_unique" = true ]; then
+            _attributes="${_attributes},\"uid\":\"$_unique_id\""
+        fi
+    else
+        if [ "$_unique" = true ]; then
+            _attributes="\"uid\":\"$_unique_id\""
+        fi
     fi
 
-    if [ "$_send_attr" = true ]; then
-        ## append unique_id to attributes
-        _attributes=$(echo "{${_attributes}\"uid\":\"$_unique_id\"}")
-
+    if [ -n "$_attributes" ]; then
         ## send entity attributes via MQTT
 #        echo "$_attr_topic => $_attributes"
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_attr_topic" -m "$_attributes"
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_attr_topic" -m "{$_attributes}"
     fi
 }
 

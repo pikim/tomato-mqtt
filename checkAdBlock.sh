@@ -34,7 +34,7 @@ esac
 #echo "AdBlock states: router=${enable_old}; hass=${enable_new}"
 
 ## publish switch entity
-mqtt_publish -g "$group" -n 'state' -f "$group" -i "$integration" -s "$enable_new" -o "\"cmd_t\":\"${prefix}/${model}_${hw_addr}/${group}/state\",\"pl_off\":\"0\",\"pl_on\":\"1\",\"ic\":\"mdi:advertisements-off\""
+mqtt_publish -g "$group" -n 'state' -f "$group" -i "$integration" -s "$enable_new" -u true -o "\"cmd_t\":\"${prefix}/${model}_${hw_addr}/${group}/state\",\"pl_off\":\"0\",\"pl_on\":\"1\",\"ic\":\"mdi:advertisements-off\""
 
 error=false
 ## leave if nothing has changed
