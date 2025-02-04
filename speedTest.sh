@@ -8,12 +8,12 @@
 [ ! -x '../speedtest/speedtest' ] && exit
 
 result=$('../speedtest/speedtest' -f csv --accept-license --accept-gdpr)
-ping=$(echo "$result" | awk -F\" '{print $6}')
-#jitter=$(echo "$result" | awk -F\" '{print $8}')
-#loss=$(echo "$result" | awk -F\" '{print $10}')
-down=$(echo "$result" | awk -F\" '{print $12}')
-up=$(echo "$result" | awk -F\" '{print $14}')
-#url=$(echo "$result" | awk -F\" '{print $29}')
+ping=$(echo "$result" | awk -F'"' '{print $6}')
+#jitter=$(echo "$result" | awk -F'"' '{print $8}')
+#loss=$(echo "$result" | awk -F'"' '{print $10}')
+down=$(echo "$result" | awk -F'"' '{print $12}')
+up=$(echo "$result" | awk -F'"' '{print $14}')
+#url=$(echo "$result" | awk -F'"' '{print $29}')
 
 # calculate kbps
 down=$((down/125))

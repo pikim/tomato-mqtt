@@ -139,11 +139,11 @@ mqtt_publish(){
     fi
 
     if [ "$_delete" = true ]; then
-        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_cfg_topic" -m ""
+        mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_cfg_topic" -m ''
         return
     fi
 
-    if [ "$_friendly" = "" ]; then
+    if [ "$_friendly" = '' ]; then
         ## no friendly name given, create one
         _friendly="${_group} ${_name}"
     fi

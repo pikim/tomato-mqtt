@@ -12,10 +12,10 @@ for i in $disks; do
     total=$(df | grep "$i" | awk '{print $2}')
     used=$(df | grep "$i" | awk '{print $3}')
     free=$(df | grep "$i" | awk '{print $4}')
-    part=$(df | grep "$i" | awk -F"/" '{ print $NF }')
+    part=$(df | grep "$i" | awk -F'/' '{ print $NF }')
 
     ## skip invalid disk names
-    [ "$part" = "" ] && continue
+    [ "$part" = '' ] && continue
 
     mqtt_publish -g 'disk' -n "$part used" -s "$used" -o '"ic":"mdi:harddisk","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'
     mqtt_publish -g 'disk' -n "$part free" -s "$free" -o '"ic":"mdi:harddisk","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B",'

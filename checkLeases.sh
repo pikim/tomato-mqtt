@@ -91,8 +91,7 @@ mqtt_publish -g 'leases' -n 'count' -s "$count" -o '"ic":"mdi:numeric","stat_cla
 
 ## iterate over active leases from dnsmasq file
 echo 'Starting to ping active clients'
-while IFS='' read -r p || [ -n "$p" ]
-do
+while IFS= read -r p || [ -n "$p" ]; do
 #    printf '%s\n' "$p"
     client_addr=$(echo "$p" | awk '{print $3}')
     client_name=$(echo "$p" | awk '{print $4}')
@@ -106,8 +105,7 @@ echo 'Finished pinging of active clients'
 
 
 ## extract inactive leases received from Home Assistant (*.lease_uid file)
-while IFS='' read -r unique_id || [ -n "$unique_id" ]
-do
+while IFS= read -r unique_id || [ -n "$unique_id" ]; do
     leases=$(echo "$leases" | jq -r "select(.uid != \"$unique_id\")")
 done < "${file_prefix}.lease_uid"
 

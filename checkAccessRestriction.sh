@@ -23,9 +23,9 @@ while IFS= read -r rrule; do
 #    continue
 
     ## get rule name and description
-    name=$(echo "$rrule" | awk -F"=" '{print $1}')
-    desc=$(echo "$rrule" | awk -F"|" '{print $NF}')
-    enable_old=$(echo "$rrule" | awk -F"[=|]" '{print $2}')
+    name=$(echo "$rrule" | awk -F'=' '{print $1}')
+    desc=$(echo "$rrule" | awk -F'|' '{print $NF}')
+    enable_old=$(echo "$rrule" | awk -F'[=|]' '{print $2}')
 #    echo "$name  $desc  $enable_old"
 
     ## skip dummy rrule0
@@ -96,8 +96,7 @@ fi
 echo 'Updating access restrictions'
 
 ## wait if any service is currently being restarted
-nvstat=$(nvram get action_service)
-while [ "$nvstat" != "" ]; do
+while [ "$(nvram get action_service)" != '' ]; do
     echo -n
 done
 
