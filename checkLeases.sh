@@ -34,7 +34,7 @@ process_active_clients(){
     state='ON'
     [ "$ping_loss" = '100' ] && state='OFF'
     echo "Publishing $client_name ($client_addr): $state"
-    mqtt_publish -g 'leases' -n "$client_name" -f "$client_name" -i "$integration" -s "$state" -o '"dev_cla":"connectivity",'
+    mqtt_publish -g 'leases' -n "$client_name" -f "$client_name" -i "$integration" -s "$state" -o '"dev_cla":"connectivity"'
 
     ## fetch internal results from mqtt_publish
     unique_id="$_unique_id"
@@ -52,7 +52,7 @@ process_active_clients(){
     ## update IP address if it has changed
     if [ "$address" != "$client_addr" ]; then
         echo "Updating IP of $client_name to $client_addr"
-        mqtt_publish -g 'leases' -n "$client_name" -f "$client_name" -i "$integration" -a "\"ip_address\":\"$client_addr\",\"discovery\":\"$cfg_topic\"" -o '"dev_cla":"connectivity",'
+        mqtt_publish -g 'leases' -n "$client_name" -f "$client_name" -i "$integration" -a "\"ip_address\":\"$client_addr\",\"discovery\":\"$cfg_topic\"" -o '"dev_cla":"connectivity"'
     fi
 }
 
@@ -86,7 +86,7 @@ process_inactive_clients(){
 
 ## get and transmit the number of leases first
 count=$(wc -l "$leases_file" | awk '{print $1}')
-mqtt_publish -g 'leases' -n 'count' -s "$count" -o '"ic":"mdi:numeric","stat_cla":"measurement","ent_cat":"diagnostic",'
+mqtt_publish -g 'leases' -n 'count' -s "$count" -o '"ic":"mdi:numeric","stat_cla":"measurement","ent_cat":"diagnostic"'
 
 
 ## iterate over active leases from dnsmasq file

@@ -78,7 +78,7 @@ fetch_entities
 ## -s|--state: entity value
 ##      e.g. '8'.
 ## -o|--options: additional information for MQTT discovery, as comma terminated string (optional)
-##      e.g. '"icon":"mdi:numeric","state_class":"measurement","device_class":"temperature","unit_of_meas":"°C","entity_category":"diagnostic",'
+##      e.g. '"icon":"mdi:numeric","state_class":"measurement","device_class":"temperature","unit_of_meas":"°C","entity_category":"diagnostic"'
 ## -f|--friendly: friendly name as string (optional)
 ##      e.g. 'CPU usage'
 ## -a|--attributes: attributes for the entity (optional)
@@ -146,6 +146,11 @@ mqtt_publish(){
     if [ "$_friendly" = '' ]; then
         ## no friendly name given, create one
         _friendly="${_group} ${_name}"
+    fi
+
+    if [ -n "$_options" ]; then
+        ## make sure the string ends with a comma
+        _options="${_options%,},"
     fi
 
     ## create variables and clean names

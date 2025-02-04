@@ -67,7 +67,7 @@ while IFS= read -r rrule; do
 #    echo "$enable_old $enable_new"
 
     ## publish entity
-    mqtt_publish -g "$group" -n "$name" -f "$desc" -i "$integration" -s "$enable_new" -a "\"rule_name\":\"$desc\"" -o "\"cmd_t\":\"${prefix}/${model}_${hw_addr}/${group}/${name}\",\"pl_off\":\"0\",\"pl_on\":\"1\",\"ic\":\"mdi:network-off-outline\","
+    mqtt_publish -g "$group" -n "$name" -f "$desc" -i "$integration" -s "$enable_new" -a "\"rule_name\":\"$desc\"" -o "\"cmd_t\":\"${prefix}/${model}_${hw_addr}/${group}/${name}\",\"pl_off\":\"0\",\"pl_on\":\"1\",\"ic\":\"mdi:network-off-outline\""
 
     ## skip following steps if nothing has changed
     if [ "$enable_old" = "$enable_new" ]; then
