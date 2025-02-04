@@ -10,6 +10,7 @@ integration='binary_sensor'
 
 ## remove the *.handled file
 rm -f "${file_prefix}.handled"
+rm -f "${file_prefix}.lease_uid"
 sync
 
 
