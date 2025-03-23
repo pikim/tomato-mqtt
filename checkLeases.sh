@@ -60,8 +60,9 @@ process_active_clients(){
 
 ## Process the inactive clients
 ## Relevant data is already available, ping client and eventually delete entity
-## $1: the name of the client as fetched from Home Assistant
+## $1: the discovery topic
 ## $2: the IP address of the client which has to be pinged
+## $3: the UID of the client which has to be pinged
 process_inactive_clients(){
     discovery="$1"
     address="$2"
@@ -79,7 +80,7 @@ process_inactive_clients(){
             echo "Deleting inactive $discovery"
             mqtt_publish -g 'na' -n 'na' -i 'na' -c "$discovery" -d true
         else
-            echo "Can't delete $uid. Topic name is missing."
+            echo "Can't delete $uid. Discovery topic is missing."
         fi
     fi
 }
