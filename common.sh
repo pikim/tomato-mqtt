@@ -131,7 +131,7 @@ mqtt_publish(){
     done
 
     ## clean name and store it as entity
-    _entity=$(echo "$_name" | sed 's/[^A-Za-z0-9\._-]/_/g' | sed 's/[_]\{2,\}/_/g')
+    _entity=$(echo "$_name" | sed 's/[^A-Za-z0-9\._]/_/g' | sed 's/[_]\{2,\}/_/g')
 
     ## define topics once and reuse them
     _cfg_topic="${discovery_topic}/${_integration}/${prefix}_${model}_${hw_addr}/${_group}_${_entity}/config"
