@@ -185,6 +185,7 @@ ${_options}\
 \"mf\":\"${manu}\",\
 \"mdl\":\"${model}\",\
 \"cu\":\"${cfg_url}\",\
+\"sn\":\"${hw_addr}\",\
 \"sw\":\"${version}\"\
 }\
 }"
