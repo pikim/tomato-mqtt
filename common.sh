@@ -173,6 +173,7 @@ mqtt_publish(){
         _json_data=\
 "{\
 \"name\":\"${_friendly}\",\
+\"def_ent_id\":\"${_integration}.${_object_id}\",\
 \"obj_id\":\"${_object_id}\",\
 ${_unique_str}\
 \"stat_t\":\"${_state_topic}\",\
