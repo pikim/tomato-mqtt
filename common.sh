@@ -274,3 +274,9 @@ rest_get(){
 
 ## curl get response:
 ## {"entity_id":"sensor.r6400v2_clients_count","state":"12","attributes":{},"last_changed":"2024-04-22T21:17:06.724753+00:00","last_updated":"2024-04-22T21:17:06.724753+00:00","context":{"id":"01HW3TPVS4RYPXA3XVK0CG36B8","parent_id":null,"user_id":"0a5940fde5564d5b9e4baf64acdd78a7"}}
+
+
+## execute when script was directly called
+if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$(basename "$0")" = "common.sh" ]; then
+    fetch_entities "$@"
+fi
