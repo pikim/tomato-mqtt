@@ -35,6 +35,13 @@ pid_file="${file_prefix}.pid"
 sourced_variables_sh=true
 
 
+## Print a log message with timestamp prefix
+## usage: log "Starte CPU-Check"
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+
 ## Fetch device entities from Home Assistant
 fetch_entities(){
     echo 'Fetching device entities from Home Assistant'
