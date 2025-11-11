@@ -66,9 +66,6 @@ fetch_entities(){
     flock --unlock 221
 }
 
-## execute function
-fetch_entities
-
 
 ## Publish device discovery, state and/or attributes
 ## -n|--name: entity name as string
