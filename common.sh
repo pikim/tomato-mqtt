@@ -281,6 +281,6 @@ rest_get(){
 
 
 ## execute when script was directly called
-if [ "${BASH_SOURCE[0]}" = "$0" ] || [ "$(basename "$0")" = "common.sh" ]; then
+if [ "$(basename "$0")" = "common.sh" ]; then
     fetch_entities "$@"
 fi
