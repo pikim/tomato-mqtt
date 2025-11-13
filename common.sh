@@ -2,6 +2,8 @@
 
 # Holds the base functionality and variables for all the other scripts.
 
+echo "Current script: $(basename "$0")"
+
 ## read custom configuration
 . './config.sh'
 
