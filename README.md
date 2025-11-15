@@ -15,6 +15,10 @@ Developped on Netgear R6400. Based on *tomato-grafana* by Andrej Walilko (https:
 - allows to track the connection state and IP of clients
 
 
+## Example
+![Dashboard example](example.png)
+
+
 ## Requirements
 
 - Router running FreshTomato (tested on 2023.2)
