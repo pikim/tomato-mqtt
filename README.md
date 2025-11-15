@@ -57,9 +57,9 @@ Modify the MQTT connection settings in `config.sh` according to your server. Als
 
 Add the following command under `Administration` -> `Scheduler` as custom cron job:
 ```
-sh /opt/tomato-mqtt/collectorStart.sh >/dev/null 2>&1
+sh /opt/tomato-mqtt/updateSensors.sh >/dev/null 2>&1
 ```
-It should run every 1 minute on every day of the week. The collectors will now run every 20 or 30 seconds. You can adjust the interval in `collectorStart.sh`.
+It should run every 3 minutes on every day of the week. AccessRestrictions and AdBlock state will be updated every 30 seconds, CPU usage and leases every 90 seconds and everything else every 3 minutes.
 
 Additionally, add this cron for the speedtest:
 ```
