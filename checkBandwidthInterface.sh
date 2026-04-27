@@ -20,7 +20,7 @@ for i in $(ls -A /sys/class/net/); do
     rx=$(cat "/sys/class/net/${i}/statistics/rx_bytes")
     tx=$(cat "/sys/class/net/${i}/statistics/tx_bytes")
 
-    i="${i//./_}"
-    mqtt_publish -g 'network' -n "$i receive" -s "$rx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
-    mqtt_publish -g 'network' -n "$i transmit" -s "$tx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
+    if_name="${i//./_}"
+    mqtt_publish -g 'network' -n "$if_name receive" -f "network $i receive" -s "$rx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
+    mqtt_publish -g 'network' -n "$if_name transmit" -f "network $i transmit" -s "$tx" -o '"ic":"mdi:server-network","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
 done

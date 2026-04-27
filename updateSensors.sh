@@ -10,8 +10,9 @@ cd "$(dirname "$(readlink -f "$0")")" || exit 1
 ## Fetch timestamp
 start=$(date +%s)
 
-## source common
+## source common and fetch entities
 . ./common.sh
+fetch_entities
 
 ## Loop 6 times
 for i in 0 1 2 3 4 5; do
@@ -24,7 +25,7 @@ for i in 0 1 2 3 4 5; do
     fi
 
     ## Each 30 seconds:
-    fetch_entities
+#    fetch_entities
     sh ./checkAccessRestriction.sh &
     sh ./checkAdBlock.sh &
 

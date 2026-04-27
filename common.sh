@@ -11,6 +11,7 @@ echo "Current script: $(basename "$0")"
 prefix='FreshTomato'
 discovery_topic='homeassistant'
 
+router_name=$(nvram get router_name)
 manu_model=$(nvram get t_model_name)
 manu=$(echo "$manu_model" | awk '{print $1}')
 model=$(echo "$manu_model" | awk '{print $2}')
@@ -26,6 +27,7 @@ hw_addr=$(echo "$(nvram get lan_hwaddr)" | tr -d ':')
 
 ## file settings
 file_prefix="/tmp/${prefix}_${model}"
+published_file="${file_prefix}.published"
 entity_file="${file_prefix}.entity"
 json_file="${file_prefix}.json"
 twig_file="${file_prefix}.twig"
@@ -105,7 +107,7 @@ mqtt_publish(){
     _integration='sensor'
     _config_topic=''
     _delete=false
-    _unique=false
+    _unique=true
 
     ## Loop through the provided arguments
     ## taken from https://linuxsimply.com/bash-scripting-tutorial/parameters/named-parameters/
@@ -174,7 +176,7 @@ mqtt_publish(){
         _unique_str="\"uniq_id\":\"${_unique_id}\","
     fi
 
-    if ! grep -Fiq "$_unique_id" "$entity_file"; then
+    if ! grep -Fiq "$_unique_id" "$published_file"; then
         ## prepare data to be sent
         _json_data=\
 "{\
@@ -187,7 +189,7 @@ ${_unique_str}\
 ${_options}\
 \"dev\":\
 {\
-\"name\":\"${hostname}\",\
+\"name\":\"${router_name}\",\
 \"ids\":[\"${manu_model} ${hw_addr}\"],\
 \"mf\":\"${manu}\",\
 \"mdl\":\"${model}\",\
@@ -201,6 +203,10 @@ ${_options}\
         ## announce entity
 #        echo "$_cfg_topic => $_json_data"
         mosquitto_pub -h "$addr" -p "$port" -u "$username" -P "$password" -t "$_cfg_topic" -m "$_json_data"
+
+        ## immediately add unique_id to suppress duplicate discovery messages
+        echo "$_unique_id" >> "$published_file"
+#        echo "{\"uid\": \"$_unique_id\"}" >> "$entity_file"
 
         ## after the discovery topic it takes some time until attr and state will show up
         usleep 400000
