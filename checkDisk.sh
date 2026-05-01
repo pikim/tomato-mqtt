@@ -7,12 +7,12 @@
 . './common.sh'
 
 for i in $disks; do
-    used=0
-    free=0
-    total=$(df | grep "$i" | awk '{print $2}')
-    used=$(df | grep "$i" | awk '{print $3}')
-    free=$(df | grep "$i" | awk '{print $4}')
-    part=$(df | grep "$i" | awk -F'/' '{ print $NF }')
+    line=$(df | grep "$i" | head -n 1)
+    total=$(echo "$line" | awk '{print $2}')
+    used=$(echo "$line" | awk '{print $3}')
+    free=$(echo "$line" | awk '{print $4}')
+    part=$(echo "$line" | awk -F'/' '{ print $NF }')
+    usage=$(( 100 * used / total ))
 
     ## skip invalid disk names
     [ "$part" = '' ] && continue
@@ -20,4 +20,5 @@ for i in $disks; do
     mqtt_publish -g 'disk' -n "$part used" -s "$used" -o '"ic":"mdi:harddisk","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
     mqtt_publish -g 'disk' -n "$part free" -s "$free" -o '"ic":"mdi:harddisk","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
     mqtt_publish -g 'disk' -n "$part total" -s "$total" -o '"ic":"mdi:harddisk","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"B"'
+    mqtt_publish -g 'disk' -n "$part usage" -s "$usage" -o '"ic":"mdi:harddisk","stat_cla":"measurement","ent_cat":"diagnostic","unit_of_meas":"%"'
 done
