@@ -56,7 +56,7 @@ fetch_entities(){
 
     ## update device_name in template.twig
     if [ ! -e "$twig_file" ]; then
-        sed "s/{% set device_name =.*/{% set device_name = '$hostname' %}/g" "template.twig" > "$twig_file"
+        sed "s/{%.*set device_name =.*/{%- set device_name = '$hostname' -%}/g" "template.twig" > "$twig_file"
     fi
 
     ## request entities
