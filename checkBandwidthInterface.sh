@@ -10,7 +10,7 @@
 ignore='dpsta ifb0 ifb1 ifb2 ifb3 lo'
 
 # Initialize stats file if it does not exist
-[ ! -f "$stats_file" ] && touch "$stats_file"
+[ ! -f "$net_stats_file" ] && touch "$net_stats_file"
 now=$(date +%s)
 
 # Read all interface data from /proc/net/dev in a single pass (highly efficient)
@@ -32,7 +32,7 @@ while read -r line; do
     case " $ignore " in *" $iface "*) continue ;; esac
 
     # Retrieve previous stats for this interface from the cache file
-    old_data=$(grep "^$iface " "$stats_file")
+    old_data=$(grep "^$iface " "$net_stats_file")
 
     if [ -n "$old_data" ]; then
         set -- $old_data
@@ -61,4 +61,4 @@ while read -r line; do
 done < /proc/net/dev
 
 # Write all updated stats to the RAM-disk file at once (minimizes I/O load)[cite: 3]
-echo -e "$new_stats" > "$stats_file"
+echo -e "$new_stats" > "$net_stats_file"
