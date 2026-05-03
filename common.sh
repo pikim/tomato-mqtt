@@ -28,6 +28,7 @@ hw_addr=$(echo "$(nvram get lan_hwaddr)" | tr -d ':')
 ## file settings
 file_prefix="/tmp/${prefix}_${model}"
 published_file="${file_prefix}.published"
+cpu_stats_file="${file_prefix}.cpu_stats"
 net_stats_file="${file_prefix}.net_stats"
 entity_file="${file_prefix}.entity"
 json_file="${file_prefix}.json"
