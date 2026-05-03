@@ -4,11 +4,15 @@
 
 . './common.sh'
 
-connections=$(cat /proc/net/nf_conntrack)
-tcp=$(echo "$connections" | grep ipv4 | grep -c tcp)
-udp=$(echo "$connections" | grep ipv4 | grep -c udp)
-icmp=$(echo "$connections" | grep ipv4 | grep -c icmp)
-total=$(echo "$connections" | grep -c ipv4)
+read tcp udp icmp total <<EOF
+$(awk '/ipv4/ {
+    total++
+    if ($0 ~ /tcp/) t++
+    else if ($0 ~ /udp/) u++
+    else if ($0 ~ /icmp/) i++
+}
+END { print t+0, u+0, i+0, total+0 }' /proc/net/nf_conntrack)
+EOF
 
 mqtt_publish -g 'connections' -n 'TCP count' -s "$tcp" -o '"ic":"mdi:numeric","stat_cla":"measurement","ent_cat":"diagnostic"'
 mqtt_publish -g 'connections' -n 'UDP count' -s "$udp" -o '"ic":"mdi:numeric","stat_cla":"measurement","ent_cat":"diagnostic"'

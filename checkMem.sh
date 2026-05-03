@@ -4,9 +4,11 @@
 
 . './common.sh'
 
-mem=$(cat /proc/meminfo)
-total=$(echo "$mem" | grep ^MemTotal | awk '{print $2}')
-free=$(echo "$mem" | grep ^MemFree | awk '{print $2}')
+{
+    read -r _ total _
+    read -r _ free _
+} < /proc/meminfo
+
 used=$(( total - free ))
 usage=$(( 100 * used / total ))
 #buffers=$(echo "$mem" | grep ^Buffers | awk '{print $2}')
@@ -23,9 +25,10 @@ mqtt_publish -g 'RAM' -n 'usage' -s "$usage" -o '"ic":"mdi:memory","stat_cla":"m
 #mqtt_publish -g 'RAM' -n 'buffers' -s "$buffers" -o '"ic":"mdi:memory","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"kB"'
 #mqtt_publish -g 'RAM' -n 'inactive' -s "$inactive" -o '"ic":"mdi:memory","stat_cla":"measurement","ent_cat":"diagnostic","dev_cla":"data_size","unit_of_meas":"kB"'
 
-nvram=$(nvram show 2>&1 1>/dev/null | tr -cd ' 0-9')
-nv_used=$(echo "$nvram" | awk '{print $1}')
-nv_free=$(echo "$nvram" | awk '{print $2}')
+nv_stats=$(nvram show 2>&1 >/dev/null)
+read -r nv_used nv_free <<EOF
+$(echo "$nv_stats" | awk '{print $2, $4}' | tr -d '()')
+EOF
 nv_total=$(( nv_used + nv_free ))
 nv_usage=$(( 100 * nv_used / nv_total ))
 

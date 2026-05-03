@@ -7,12 +7,14 @@
 . './common.sh'
 
 for i in $disks; do
-    line=$(df | grep "$i" | head -n 1)
-    total=$(echo "$line" | awk '{print $2}')
-    used=$(echo "$line" | awk '{print $3}')
-    free=$(echo "$line" | awk '{print $4}')
-    part=$(echo "$line" | awk -F'/' '{ print $NF }')
-    usage=$(( 100 * used / total ))
+    read -r total used free usage part <<EOF
+$(df | awk -v disk="$i" '$0 ~ disk {
+    split($NF, path, "/");
+    u = $5; gsub(/%/, "", u);
+    print $2, $3, $4, u, path[length(path)];
+    exit
+}')
+EOF
 
     ## skip invalid disk names
     [ "$part" = '' ] && continue
