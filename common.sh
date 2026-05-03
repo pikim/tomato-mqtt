@@ -29,6 +29,7 @@ hw_addr=$(echo "$(nvram get lan_hwaddr)" | tr -d ':')
 file_prefix="/tmp/${prefix}_${model}"
 published_file="${file_prefix}.published"
 entity_file="${file_prefix}.entity"
+stats_file="${file_prefix}.stats"
 json_file="${file_prefix}.json"
 twig_file="${file_prefix}.twig"
 pid_file="${file_prefix}.pid"
