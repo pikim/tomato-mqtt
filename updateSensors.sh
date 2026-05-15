@@ -12,7 +12,7 @@ start=$(date +%s)
 
 ## source common and fetch entities
 . ./common.sh
-fetch_entities
+#fetch_entities
 
 ## Loop 6 times
 for i in 0 1 2 3 4 5; do
@@ -25,7 +25,7 @@ for i in 0 1 2 3 4 5; do
     fi
 
     ## Each 30 seconds:
-#    fetch_entities
+    fetch_entities # mandatory for the following 2 calls
     sh ./checkAccessRestriction.sh &
     sh ./checkAdBlock.sh &
 
